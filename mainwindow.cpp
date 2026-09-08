@@ -107,6 +107,8 @@ QString MainWindow::paragraph(const QString &line)
     QString text = line;
     // Check the line for bold Markdown.
     text = bold(text);
+    // Check the line for italic Markdown.
+    text = italic(text);
     // Put the processed text inside an HTML paragraph.
     QString html = "<p>" + text + "</p>";
     return html;
@@ -131,30 +133,63 @@ QString MainWindow::bold(const QString &line)
 {
     // Convert the QString to a standard C++ string.
     std::string text = line.toStdString();
-    // Find the opening "**".
+    // Find the first "**".
     size_t start = text.find("**");
-    // If no opening "**" was found, return the original line.
-    if (start == std::string::npos)
+    // Keep looking for bold sections.
+    while (start != std::string::npos)
     {
-        return line;
+        // Find the closing "**".
+        size_t end = text.find("**", start + 2);
+        // Stop if there is no closing "**".
+        if (end == std::string::npos)
+        {
+            break;
+        }
+        // Extract the text before the bold section.
+        std::string before = text.substr(0, start);
+        // Extract the text inside the bold section.
+        std::string boldText = text.substr(start + 2, end - start - 2);
+        // Extract the text after the bold section.
+        std::string after = text.substr(end + 2);
+        // Replace the Markdown with HTML.
+        text = before + "<strong>" + boldText + "</strong>" + after;
+        // Look for another "**" after the HTML we just created.
+        start = text.find("**", start + 8);
     }
-    // Find the closing "**" after the opening "**".
-    size_t end = text.find("**", start + 2);
-    // If no closing "**" was found, return the original line.
-    if (end == std::string::npos)
-    {
-        return line;
-    }
-    // Extract the text before the bold section.
-    std::string before = text.substr(0, start);
-    // Extract the text between the two "**" markers.
-    std::string boldText = text.substr(start + 2, end - start - 2);
-    // Extract the text after the bold section.
-    std::string after = text.substr(end + 2);
-    // Combine the sections into HTML.
-    std::string result = before + "<strong>" + boldText + "</strong>" + after;
     // Convert the result into a QString.
-    QString html = QString::fromStdString(result);
+    QString html = QString::fromStdString(text);
+    return html;
+}
+
+QString MainWindow::italic(const QString &line)
+{
+    // Convert the QString to a standard C++ string.
+    std::string text = line.toStdString();
+    // Find the first "*".
+    size_t start = text.find("*");
+    // Keep looking for italic sections.
+    while (start != std::string::npos)
+    {
+        // Find the closing "*".
+        size_t end = text.find("*", start + 1);
+        // Stop if there is no closing "*".
+        if (end == std::string::npos)
+        {
+            break;
+        }
+        // Extract the text before the italic section.
+        std::string before = text.substr(0, start);
+        // Extract the text inside the italic section.
+        std::string italicText = text.substr(start + 1, end - start - 1);
+        // Extract the text after the italic section.
+        std::string after = text.substr(end + 1);
+        // Replace the Markdown with HTML.
+        text = before + "<em>" + italicText + "</em>" + after;
+        // Look for another "*" after the HTML the initial one
+        start = text.find("*", start + 4);
+    }
+    // Convert the result into a QString.
+    QString html = QString::fromStdString(text);
     return html;
 }
 
