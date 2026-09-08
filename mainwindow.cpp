@@ -17,8 +17,145 @@ void MainWindow::updatePreview()
 {
     // saves the text from textInput
     QString text = ui->textInput->toPlainText();
-    // copies the text to the preview
-    ui->preview->setPlainText(text);
+    // convert the input to Html
+    QString html = markdownToHtml(text);
+    // Displays the html
+    ui->preview->setHtml(html);
+}
+
+QString MainWindow::markdownToHtml(const QString &markdown)
+{
+    // Split the document into individual lines.
+    QStringList lines = markdown.split('\n');
+    // Store the generated HTML.
+    QString html;
+    // Process each line separately.
+    for (QString line : lines)
+    {
+        // Ignore empty lines for now.
+        if (line.isEmpty())
+        {
+            continue;
+        }
+        // Split the line using a space as the delimiter.
+        // The first part tells us what type of Markdown element
+        // the line represents.
+        QStringList words = line.split(' ');
+        // Get the first section of the line.
+        QString first = words[0];
+        // Check for a level 1 heading.
+        if (first == "#")
+        {
+            html += heading(line, 1);
+        }
+        // Check for a level 2 heading.
+        else if (first == "##")
+        {
+            html += heading(line, 2);
+        }
+        // Check for a level 3 heading.
+        else if (first == "###")
+        {
+            html += heading(line, 3);
+        }
+        // Check for an unordered list item.
+        else if (first == "-")
+        {
+            html += unorderedList(line);
+        }
+        // Anything else is treated as a paragraph.
+        else
+        {
+            html += paragraph(line);
+        }
+    }
+    // Return the completed HTML.
+    return html;
+}
+
+QString MainWindow::heading(const QString &line, int level)
+{
+    // Convert the QString to a standard C++ string.
+    std::string text = line.toStdString();
+    // Find the first space separating the Markdown symbol from the heading text.
+    size_t space = text.find(' ');
+    // Extract everything after the first space.
+    std::string headingText = text.substr(space + 1);
+    // Convert the extracted text back into a QString.
+    QString result = QString::fromStdString(headingText);
+    // Store the generated HTML before returning it.
+    QString html;
+    // Create the appropriate HTML heading based on the heading level.
+    if (level == 1)
+    {
+        html = "<h1>" + result + "</h1>";
+    }
+    else if (level == 2)
+    {
+        html = "<h2>" + result + "</h2>";
+    }
+    else
+    {
+        html = "<h3>" + result + "</h3>";
+    }
+    return html;
+}
+
+QString MainWindow::paragraph(const QString &line)
+{
+    // Store the original line so we can modify it.
+    QString text = line;
+    // Check the line for bold Markdown.
+    text = bold(text);
+    // Put the processed text inside an HTML paragraph.
+    QString html = "<p>" + text + "</p>";
+    return html;
+}
+
+QString MainWindow::unorderedList(const QString &line)
+{
+    // Convert the QString to a standard C++ string.
+    std::string text = line.toStdString();
+    // Find the first space separating "- " from the list item.
+    size_t space = text.find(' ');
+    // Extract everything after "- ".
+    std::string itemText = text.substr(space + 1);
+    // Convert the extracted text back into a QString.
+    QString item = QString::fromStdString(itemText);
+    // Store the generated HTML before returning it.
+    QString html = "<ul><li>" + item + "</li></ul>";
+    return html;
+}
+
+QString MainWindow::bold(const QString &line)
+{
+    // Convert the QString to a standard C++ string.
+    std::string text = line.toStdString();
+    // Find the opening "**".
+    size_t start = text.find("**");
+    // If no opening "**" was found, return the original line.
+    if (start == std::string::npos)
+    {
+        return line;
+    }
+    // Find the closing "**" after the opening "**".
+    size_t end = text.find("**", start + 2);
+    // If no closing "**" was found, return the original line.
+    if (end == std::string::npos)
+    {
+        return line;
+    }
+    // Extract the text before the bold section.
+    std::string before = text.substr(0, start);
+    // Extract the text between the two "**" markers.
+    std::string boldText = text.substr(start + 2, end - start - 2);
+    // Extract the text after the bold section.
+    std::string after = text.substr(end + 2);
+    // Combine the sections into HTML.
+    std::string result = before + "<strong>" + boldText + "</strong>" + after;
+    // Convert the result into a QString.
+    QString html = QString::fromStdString(result);
+    return html;
 }
 
 //destructor
