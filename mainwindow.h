@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QLabel>
 #include "markdownparser.h"
 
 QT_BEGIN_NAMESPACE
@@ -20,8 +21,13 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    QLabel *cursorPosition;
+
     // Updates the preview when the Markdown text changes.
     void updatePreview();
+
+    // Update cursorPosition
+    void updateCursorPosition();
 
     // Markdown parser.
     MarkdownParser parser;

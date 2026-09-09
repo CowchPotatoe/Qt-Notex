@@ -67,7 +67,7 @@
      <height>24</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuMarkdown_Editor">
+   <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>File</string>
     </property>
@@ -87,7 +87,7 @@
      <string>Insert</string>
     </property>
    </widget>
-   <addaction name="menuMarkdown_Editor"/>
+   <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuView"/>
    <addaction name="menuInsert"/>
@@ -103,10 +103,10 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="undoButton"/>
-   <addaction name="redoButton"/>
+   <addaction name="undoAction"/>
+   <addaction name="redoAction"/>
   </widget>
-  <action name="undoButton">
+  <action name="undoAction">
    <property name="icon">
     <iconset theme="QIcon::ThemeIcon::EditUndo"/>
    </property>
@@ -123,7 +123,7 @@
     <enum>QAction::MenuRole::NoRole</enum>
    </property>
   </action>
-  <action name="redoButton">
+  <action name="redoAction">
    <property name="icon">
     <iconset theme="QIcon::ThemeIcon::EditRedo"/>
    </property>
