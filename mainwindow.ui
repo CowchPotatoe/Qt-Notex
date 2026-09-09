@@ -103,10 +103,10 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionUndo"/>
-   <addaction name="actionRedo"/>
+   <addaction name="undoButton"/>
+   <addaction name="redoButton"/>
   </widget>
-  <action name="actionUndo">
+  <action name="undoButton">
    <property name="icon">
     <iconset theme="QIcon::ThemeIcon::EditUndo"/>
    </property>
@@ -123,7 +123,7 @@
     <enum>QAction::MenuRole::NoRole</enum>
    </property>
   </action>
-  <action name="actionRedo">
+  <action name="redoButton">
    <property name="icon">
     <iconset theme="QIcon::ThemeIcon::EditRedo"/>
    </property>

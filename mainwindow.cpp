@@ -8,9 +8,15 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     // change window title
     setWindowTitle("MarkTex");
-    // updates in textInput signals changes in the slot Preview
-    connect(ui->textInput, &QTextEdit::textChanged, this, &MainWindow::updatePreview);
-
+    // Update preview when text changes.
+    connect(ui->textInput, &QTextEdit::textChanged,
+            this, &MainWindow::updatePreview);
+    // Undo.
+    connect(ui->undoButton, &QAction::triggered,
+            ui->textInput, &QTextEdit::undo);
+    // Redo.
+    connect(ui->redoButton, &QAction::triggered,
+            ui->textInput, &QTextEdit::redo);
 }
 
 void MainWindow::updatePreview()
