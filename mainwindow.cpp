@@ -11,7 +11,6 @@ MainWindow::MainWindow(QWidget *parent)
     // Update preview when text changes.
     connect(ui->textInput, &QTextEdit::textChanged,
             this, &MainWindow::updatePreview);
-
     // Create the cursor position label.
     cursorPosition = new QLabel("Ln 1, Col 0", this);
     // Add the label to the right side of the status bar.
@@ -19,13 +18,34 @@ MainWindow::MainWindow(QWidget *parent)
     // Update the cursor position whenever the cursor moves.
     connect(ui->textInput, &QTextEdit::cursorPositionChanged,
             this, &MainWindow::updateCursorPosition);
-
     // Undo.
-    connect(ui->undoAction, &QAction::triggered,
+    connect(ui->actionUndo, &QAction::triggered,
             ui->textInput, &QTextEdit::undo);
     // Redo.
-    connect(ui->redoAction, &QAction::triggered,
+    connect(ui->actionRedo, &QAction::triggered,
             ui->textInput, &QTextEdit::redo);
+
+    // Edit menu stuff
+    connect(ui->actionUndo2, &QAction::triggered,
+            ui->textInput, &QTextEdit::undo);
+
+    connect(ui->actionRedo2, &QAction::triggered,
+            ui->textInput, &QTextEdit::redo);
+
+    connect(ui->actionCut, &QAction::triggered,
+            ui->textInput, &QTextEdit::cut);
+
+    connect(ui->actionCopy, &QAction::triggered,
+            ui->textInput, &QTextEdit::copy);
+
+    connect(ui->actionPaste, &QAction::triggered,
+            ui->textInput, &QTextEdit::paste);
+
+    connect(ui->actionSelectAll, &QAction::triggered,
+            ui->textInput, &QTextEdit::selectAll);
+    // Clear Text
+    connect(ui->actionClear, &QAction::triggered,
+            this, &MainWindow::clearText);
 }
 
 void MainWindow::updatePreview()
@@ -51,6 +71,11 @@ void MainWindow::updateCursorPosition()
                        + ", Col " + QString::number(column);
     // Display the cursor position.
     cursorPosition->setText(position);
+}
+
+void MainWindow::clearText()
+{
+    ui->textInput->clear();
 }
 
 //destructor

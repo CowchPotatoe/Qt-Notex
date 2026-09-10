@@ -149,7 +149,7 @@ QString MarkdownParser::paragraph(const QString &line)
     // Check the line for italic Markdown.
     text = italic(text);
     // Put the processed text inside an HTML paragraph.
-    QString html = "<p>" + text + "</p>";
+    QString html = "<div>" + text + "</div>";
     return html;
 }
 
