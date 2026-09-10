@@ -6,44 +6,68 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    // change window title
+
+    setupWindow();
+    setupStatusBar();
+    setupEditor();
+    setupToolBar();
+    setupEditActions();
+}
+
+void MainWindow::setupWindow()
+{
     setWindowTitle("MarkTex");
-    // Update preview when text changes.
-    connect(ui->textInput, &QTextEdit::textChanged,
-            this, &MainWindow::updatePreview);
+}
+
+void MainWindow::setupStatusBar()
+{
     // Create the cursor position label.
     cursorPosition = new QLabel("Ln 1, Col 0", this);
     // Add the label to the right side of the status bar.
     ui->statusbar->addPermanentWidget(cursorPosition);
+}
+
+void MainWindow::setupEditor()
+{
+    // Update preview when text changes.
+    connect(ui->textInput, &QTextEdit::textChanged,
+            this, &MainWindow::updatePreview);
     // Update the cursor position whenever the cursor moves.
     connect(ui->textInput, &QTextEdit::cursorPositionChanged,
             this, &MainWindow::updateCursorPosition);
+}
+
+void MainWindow::setupToolBar()
+{
     // Undo.
     connect(ui->actionUndo, &QAction::triggered,
             ui->textInput, &QTextEdit::undo);
     // Redo.
     connect(ui->actionRedo, &QAction::triggered,
             ui->textInput, &QTextEdit::redo);
+}
 
-    // Edit menu stuff
+void MainWindow::setupEditActions()
+{
+    // Undo.
     connect(ui->actionUndo2, &QAction::triggered,
             ui->textInput, &QTextEdit::undo);
-
+    // Redo.
     connect(ui->actionRedo2, &QAction::triggered,
             ui->textInput, &QTextEdit::redo);
-
+    // Cut.
     connect(ui->actionCut, &QAction::triggered,
             ui->textInput, &QTextEdit::cut);
-
+    // Copy.
     connect(ui->actionCopy, &QAction::triggered,
             ui->textInput, &QTextEdit::copy);
-
+    // Paste.
     connect(ui->actionPaste, &QAction::triggered,
             ui->textInput, &QTextEdit::paste);
-
+    // Select all.
     connect(ui->actionSelectAll, &QAction::triggered,
             ui->textInput, &QTextEdit::selectAll);
-    // Clear Text
+    // Clear text.
     connect(ui->actionClear, &QAction::triggered,
             this, &MainWindow::clearText);
 }

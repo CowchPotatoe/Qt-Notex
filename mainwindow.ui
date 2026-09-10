@@ -123,9 +123,6 @@
    <property name="toolTip">
     <string>Undo last change</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+Z</string>
-   </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>
    </property>
@@ -140,9 +137,6 @@
    <property name="toolTip">
     <string>Redo last change</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+Y</string>
-   </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>
    </property>
@@ -151,30 +145,48 @@
    <property name="text">
     <string>Undo</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Z</string>
+   </property>
   </action>
   <action name="actionRedo2">
    <property name="text">
     <string>Redo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Y</string>
    </property>
   </action>
   <action name="actionCut">
    <property name="text">
     <string>Cut</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+X</string>
+   </property>
   </action>
   <action name="actionCopy">
    <property name="text">
     <string>Copy</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
    </property>
   </action>
   <action name="actionPaste">
    <property name="text">
     <string>Paste</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+V</string>
+   </property>
   </action>
   <action name="actionSelectAll">
    <property name="text">
     <string>Select All</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
    </property>
   </action>
   <action name="actionClear">
