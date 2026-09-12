@@ -88,9 +88,12 @@
     <property name="title">
      <string>View</string>
     </property>
-    <addaction name="actionShowMarkdown"/>
-    <addaction name="actionShowPreview"/>
-    <addaction name="actionSplitView"/>
+    <addaction name="actionMarkdown"/>
+    <addaction name="actionPreview"/>
+    <addaction name="actionSplit"/>
+    <addaction name="actionZoomIn"/>
+    <addaction name="actionZoomOut"/>
+    <addaction name="actionResetZoom"/>
    </widget>
    <widget class="QMenu" name="menuInsert">
     <property name="title">
@@ -117,6 +120,10 @@
    </attribute>
    <addaction name="actionUndo"/>
    <addaction name="actionRedo"/>
+   <addaction name="separator"/>
+   <addaction name="actionMarkdown"/>
+   <addaction name="actionPreview"/>
+   <addaction name="actionSplit"/>
   </widget>
   <action name="actionUndo">
    <property name="icon">
@@ -199,19 +206,19 @@
     <string>Clear</string>
    </property>
   </action>
-  <action name="actionShowMarkdown">
+  <action name="actionMarkdown">
    <property name="text">
-    <string>Show Markdown</string>
+    <string>Markdown</string>
    </property>
   </action>
-  <action name="actionShowPreview">
+  <action name="actionPreview">
    <property name="text">
-    <string>Show Preview</string>
+    <string>Preview</string>
    </property>
   </action>
-  <action name="actionSplitView">
+  <action name="actionSplit">
    <property name="text">
-    <string>Split View</string>
+    <string>Split</string>
    </property>
   </action>
   <action name="actionBold">
@@ -228,6 +235,21 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+I</string>
+   </property>
+  </action>
+  <action name="actionZoomIn">
+   <property name="text">
+    <string>Zoom In</string>
+   </property>
+  </action>
+  <action name="actionZoomOut">
+   <property name="text">
+    <string>Zoom Out</string>
+   </property>
+  </action>
+  <action name="actionResetZoom">
+   <property name="text">
+    <string>Reset Zoom</string>
    </property>
   </action>
  </widget>

@@ -80,14 +80,23 @@ void MainWindow::setupEditActions()
 void MainWindow::setupViewActions()
 {
     // Show Markdown editor.
-    connect(ui->actionShowMarkdown, &QAction::triggered,
-            this, &MainWindow::showMarkdown);
+    connect(ui->actionMarkdown, &QAction::triggered,
+            this, &MainWindow::Markdown);
     // Show preview.
-    connect(ui->actionShowPreview, &QAction::triggered,
-            this, &MainWindow::showPreview);
+    connect(ui->actionPreview, &QAction::triggered,
+            this, &MainWindow::Preview);
     // Show both editor and preview.
-    connect(ui->actionSplitView, &QAction::triggered,
-            this, &MainWindow::splitView);
+    connect(ui->actionSplit, &QAction::triggered,
+            this, &MainWindow::Split);
+    // Zoom in.
+    connect(ui->actionZoomIn, &QAction::triggered,
+            this, &MainWindow::zoomIn);
+    // Zoom out.
+    connect(ui->actionZoomOut, &QAction::triggered,
+            this, &MainWindow::zoomOut);
+    // Reset zoom.
+    connect(ui->actionResetZoom, &QAction::triggered,
+            this, &MainWindow::resetZoom);
 }
 
 void MainWindow::setupInsertActions()
@@ -100,21 +109,26 @@ void MainWindow::setupInsertActions()
             this, &MainWindow::insertItalic);
 }
 
-
 void MainWindow::updatePreview()
 {
-    // Saves the text from textInput
+    // Get the text from textInput.
     QString text = ui->textInput->toPlainText();
     // Check if the editor is empty.
     if (text.isEmpty())
     {
-        // Display a message when there is nothing to preview.
-        ui->preview->setHtml("<p>This is the preview.</p>");
+        QString text =
+            "<p style='font-size: " + QString::number(zoomLevel) +
+            "pt;'>Your Markdown preview will appear here.</p>";
+
+        ui->preview->setHtml(text);
         return;
     }
-    // convert the input to Html
+    // Convert the Markdown input to HTML.
     QString html = parser.parse(text);
-    // Displays the html
+    // Apply the zoom level to the preview.
+    html = "<div style='font-size: " + QString::number(zoomLevel) +
+           "pt;'>" + html + "</div>";
+    // Display the HTML.
     ui->preview->setHtml(html);
 }
 
@@ -138,22 +152,52 @@ void MainWindow::clearText()
     ui->textInput->clear();
 }
 
-void MainWindow::showMarkdown()
+void MainWindow::Markdown()
 {
     ui->textInput->show();
     ui->preview->hide();
 }
 
-void MainWindow::showPreview()
+void MainWindow::Preview()
 {
     ui->textInput->hide();
     ui->preview->show();
 }
 
-void MainWindow::splitView()
+void MainWindow::Split()
 {
     ui->textInput->show();
     ui->preview->show();
+}
+
+void MainWindow::zoomIn()
+{
+    zoomLevel += 1;
+    QFont font = ui->textInput->font();
+    font.setPointSize(zoomLevel);
+    ui->textInput->setFont(font);
+    updatePreview();
+}
+
+void MainWindow::zoomOut()
+{
+    if (zoomLevel > 6)
+    {
+        zoomLevel -= 1;
+        QFont font = ui->textInput->font();
+        font.setPointSize(zoomLevel);
+        ui->textInput->setFont(font);
+        updatePreview();
+    }
+}
+
+void MainWindow::resetZoom()
+{
+    zoomLevel = 12;
+    QFont font = ui->textInput->font();
+    font.setPointSize(zoomLevel);
+    ui->textInput->setFont(font);
+    updatePreview();
 }
 
 void MainWindow::insertBold()

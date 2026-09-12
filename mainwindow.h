@@ -22,6 +22,8 @@ public:
 
 private:
     Ui::MainWindow *ui;
+
+    int zoomLevel = 12;
     QLabel *cursorPosition;
     // Markdown parser.
     MarkdownParser parser;
@@ -37,9 +39,12 @@ private:
     void updatePreview();
     void updateCursorPosition();
     void clearText();
-    void showMarkdown();
-    void showPreview();
-    void splitView();
+    void Markdown();
+    void Preview();
+    void Split();
+    void zoomIn();
+    void zoomOut();
+    void resetZoom();
     void insertBold();
     void insertItalic();
 };
