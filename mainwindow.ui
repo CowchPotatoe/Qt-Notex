@@ -96,6 +96,8 @@
     <property name="title">
      <string>Insert</string>
     </property>
+    <addaction name="actionBold"/>
+    <addaction name="actionItalic"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -210,6 +212,22 @@
   <action name="actionSplitView">
    <property name="text">
     <string>Split View</string>
+   </property>
+  </action>
+  <action name="actionBold">
+   <property name="text">
+    <string>Bold</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+B</string>
+   </property>
+  </action>
+  <action name="actionItalic">
+   <property name="text">
+    <string>Italic</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+I</string>
    </property>
   </action>
  </widget>

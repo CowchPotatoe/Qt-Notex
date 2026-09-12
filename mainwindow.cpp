@@ -13,6 +13,7 @@ MainWindow::MainWindow(QWidget *parent)
     setupToolBar();
     setupEditActions();
     setupViewActions();
+    setupInsertActions();
 }
 
 void MainWindow::setupWindow()
@@ -30,12 +31,15 @@ void MainWindow::setupStatusBar()
 
 void MainWindow::setupEditor()
 {
+    // Distinguish between editor and preview
+    ui->textInput->setPlaceholderText("Start writing in Markdown...");
     // Update preview when text changes.
     connect(ui->textInput, &QTextEdit::textChanged,
             this, &MainWindow::updatePreview);
     // Update the cursor position whenever the cursor moves.
     connect(ui->textInput, &QTextEdit::cursorPositionChanged,
             this, &MainWindow::updateCursorPosition);
+    updatePreview();
 }
 
 void MainWindow::setupToolBar()
@@ -86,10 +90,28 @@ void MainWindow::setupViewActions()
             this, &MainWindow::splitView);
 }
 
+void MainWindow::setupInsertActions()
+{
+    // Bold selected text.
+    connect(ui->actionBold, &QAction::triggered,
+            this, &MainWindow::insertBold);
+    // Italicize selected text.
+    connect(ui->actionItalic, &QAction::triggered,
+            this, &MainWindow::insertItalic);
+}
+
+
 void MainWindow::updatePreview()
 {
-    // saves the text from textInput
+    // Saves the text from textInput
     QString text = ui->textInput->toPlainText();
+    // Check if the editor is empty.
+    if (text.isEmpty())
+    {
+        // Display a message when there is nothing to preview.
+        ui->preview->setHtml("<p>This is the preview.</p>");
+        return;
+    }
     // convert the input to Html
     QString html = parser.parse(text);
     // Displays the html
@@ -132,6 +154,53 @@ void MainWindow::splitView()
 {
     ui->textInput->show();
     ui->preview->show();
+}
+
+void MainWindow::insertBold()
+{
+    // Get the current text cursor from the Markdown editor.
+    QTextCursor cursor = ui->textInput->textCursor();
+    // Check if the user has selected any text.
+    if (cursor.hasSelection())
+    {
+        // Get the selected text.
+        QString selectedText = cursor.selectedText();
+        // Replace the selected text with Markdown bold syntax.
+        cursor.insertText("**" + selectedText + "**");
+    }
+    else
+    {
+        // Insert an empty pair of bold markers.
+        cursor.insertText("****");
+        // Move the cursor left twice so it is between the markers.
+        cursor.movePosition(QTextCursor::Left);
+        cursor.movePosition(QTextCursor::Left);
+        // Update the editor's cursor to the new position.
+        ui->textInput->setTextCursor(cursor);
+    }
+}
+
+void MainWindow::insertItalic()
+{
+    // Get the current text cursor from the Markdown editor.
+    QTextCursor cursor = ui->textInput->textCursor();
+    // Check if the user has selected any text.
+    if (cursor.hasSelection())
+    {
+        // Get the selected text.
+        QString selectedText = cursor.selectedText();
+        // Replace the selected text with Markdown italic syntax.
+        cursor.insertText("*" + selectedText + "*");
+    }
+    else
+    {
+        // Insert an empty pair of italic markers.
+        cursor.insertText("**");
+        // Move the cursor left once so it is between the markers.
+        cursor.movePosition(QTextCursor::Left);
+        // Update the editor's cursor to the new position.
+        ui->textInput->setTextCursor(cursor);
+    }
 }
 
 //destructor

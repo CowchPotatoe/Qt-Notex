@@ -32,6 +32,7 @@ private:
     void setupToolBar();
     void setupEditActions();
     void setupViewActions();
+    void setupInsertActions();
 
     void updatePreview();
     void updateCursorPosition();
@@ -39,5 +40,7 @@ private:
     void showMarkdown();
     void showPreview();
     void splitView();
+    void insertBold();
+    void insertItalic();
 };
 #endif // MAINWINDOW_H
