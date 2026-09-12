@@ -12,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent)
     setupEditor();
     setupToolBar();
     setupEditActions();
+    setupViewActions();
 }
 
 void MainWindow::setupWindow()
@@ -72,6 +73,19 @@ void MainWindow::setupEditActions()
             this, &MainWindow::clearText);
 }
 
+void MainWindow::setupViewActions()
+{
+    // Show Markdown editor.
+    connect(ui->actionShowMarkdown, &QAction::triggered,
+            this, &MainWindow::showMarkdown);
+    // Show preview.
+    connect(ui->actionShowPreview, &QAction::triggered,
+            this, &MainWindow::showPreview);
+    // Show both editor and preview.
+    connect(ui->actionSplitView, &QAction::triggered,
+            this, &MainWindow::splitView);
+}
+
 void MainWindow::updatePreview()
 {
     // saves the text from textInput
@@ -100,6 +114,24 @@ void MainWindow::updateCursorPosition()
 void MainWindow::clearText()
 {
     ui->textInput->clear();
+}
+
+void MainWindow::showMarkdown()
+{
+    ui->textInput->show();
+    ui->preview->hide();
+}
+
+void MainWindow::showPreview()
+{
+    ui->textInput->hide();
+    ui->preview->show();
+}
+
+void MainWindow::splitView()
+{
+    ui->textInput->show();
+    ui->preview->show();
 }
 
 //destructor

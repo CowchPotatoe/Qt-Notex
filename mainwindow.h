@@ -31,9 +31,13 @@ private:
     void setupEditor();
     void setupToolBar();
     void setupEditActions();
+    void setupViewActions();
 
     void updatePreview();
     void updateCursorPosition();
     void clearText();
+    void showMarkdown();
+    void showPreview();
+    void splitView();
 };
 #endif // MAINWINDOW_H
