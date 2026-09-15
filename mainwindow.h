@@ -62,6 +62,7 @@ private:
     void loadFile(const QString &fileName);
     void saveFile();
     void saveFileAs();
+    void exportPDF();
     void exitApp();
 
 };

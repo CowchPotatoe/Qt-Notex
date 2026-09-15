@@ -1,11 +1,20 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 
+// File handling.
 #include <QFileDialog>
 #include <QFile>
 #include <QFileInfo>
 #include <QTextStream>
+// Messages.
 #include <QMessageBox>
+// PDF export.
+#include <QPdfWriter>
+#include <QPageSize>
+#include <QPageLayout>
+#include <QMarginsF>
+#include <QPainter>
+#include <QTextDocument>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -121,19 +130,18 @@ void MainWindow::setupFileActions()
     // Create a new document.
     connect(ui->actionNew, &QAction::triggered,
             this, &MainWindow::newFile);
-
     // Open an existing document.
     connect(ui->actionOpen, &QAction::triggered,
             this, &MainWindow::openFile);
-
     // Save the current document.
     connect(ui->actionSave, &QAction::triggered,
             this, &MainWindow::saveFile);
-
     // Save the document with a new file name.
     connect(ui->actionSaveAs, &QAction::triggered,
             this, &MainWindow::saveFileAs);
-
+    // Export the preview as a PDF.
+    connect(ui->actionExportPDF, &QAction::triggered,
+            this, &MainWindow::exportPDF);
     // Exit MarkTex.
     connect(ui->actionExit, &QAction::triggered,
             this, &MainWindow::exitApp);
@@ -427,6 +435,118 @@ void MainWindow::saveFileAs()
     setWindowTitle(
         "MarkTex - " + QFileInfo(currentFile).fileName()
         );
+}
+
+void MainWindow::exportPDF()
+{
+    // Open a dialog so the user can choose where to save the PDF.
+    QString fileName = QFileDialog::getSaveFileName(
+        this,
+        "Export PDF",
+        "",
+        "PDF Files (*.pdf)"
+        );
+    // Stop if the user cancels the dialog.
+    if (fileName.isEmpty())
+    {
+        return;
+    }
+    // Make sure the file has a .pdf extension.
+    if (!fileName.endsWith(".pdf", Qt::CaseInsensitive))
+    {
+        fileName += ".pdf";
+    }
+
+    // Get the Markdown text from the editor.
+    QString markdown = ui->textInput->toPlainText();
+    // Stop if there is nothing to export.
+    if (markdown.isEmpty())
+    {
+        QMessageBox::information(
+            this,
+            "MarkTex",
+            "There is no Markdown to export."
+            );
+
+        return;
+    }
+    // use the parsed html
+    QString html = parser.parse(markdown);
+    // Add PDF-specific formatting.
+    html =
+        "<html>"
+        "<head>"
+        "<style>"
+
+        // Normal body text.
+        "body {"
+        "    font-family: sans-serif;"
+        "    font-size: 12pt;"
+        "    line-height: 1.5;"
+        "}"
+
+        // Heading sizes.
+        "h1 {"
+        "    font-size: 24pt;"
+        "    margin-bottom: 12pt;"
+        "}"
+
+        "h2 {"
+        "    font-size: 20pt;"
+        "    margin-bottom: 10pt;"
+        "}"
+
+        "h3 {"
+        "    font-size: 16pt;"
+        "    margin-bottom: 8pt;"
+        "}"
+
+        // Paragraph spacing.
+        "p {"
+        "    margin-top: 0;"
+        "    margin-bottom: 10pt;"
+        "}"
+
+        // List spacing.
+        "ul, ol {"
+        "    margin-top: 0;"
+        "    margin-bottom: 10pt;"
+        "}"
+
+        "</style>"
+        "</head>"
+        "<body>"
+        + html +
+        "</body>"
+        "</html>";
+    // Create the PDF writer.
+    QPdfWriter pdf(fileName);
+    // Use 72 DPI so PDF points and painter coordinates match.
+    pdf.setResolution(72);
+    // Set 1-inch margins.
+    QMarginsF margins(72, 72, 72, 72);
+    // Create the A4 portrait page layout.
+    QPageLayout layout(
+        QPageSize(QPageSize::A4),
+        QPageLayout::Portrait,
+        margins
+        );
+    // Apply the page layout to the PDF.
+    pdf.setPageLayout(layout);
+    // Create the text document.
+    QTextDocument document;
+    // Load the formatted HTML into the document.
+    document.setHtml(html);
+    // Set the document size to the printable area.
+    document.setPageSize(
+        pdf.pageLayout().paintRect(QPageLayout::Point).size()
+        );
+    // Create a painter for the PDF.
+    QPainter painter(&pdf);
+    // Draw the document onto the PDF.
+    document.drawContents(&painter);
+    // Finish writing the PDF.
+    painter.end();
 }
 
 void MainWindow::exitApp()
