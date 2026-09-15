@@ -43,6 +43,7 @@ private:
 
     void updatePreview();
     void updateCursorPosition();
+    void openNewWindow();
     // Edit operations
     void clearText();
     // View operations
@@ -58,6 +59,7 @@ private:
     // File operations.
     void newFile();
     void openFile();
+    void loadFile(const QString &fileName);
     void saveFile();
     void saveFileAs();
     void exitApp();

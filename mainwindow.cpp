@@ -279,9 +279,16 @@ void MainWindow::insertItalic()
 
 void MainWindow::newFile()
 {
-    // Clear the Markdown editor.
+    // Check if the Markdown editor already contains text.
+    if (!ui->textInput->toPlainText().isEmpty())
+    {
+        // Open a new MarkTex window instead of deleting the current text.
+        openNewWindow();
+        return;
+    }
+    // Clear the editor if it is already empty.
     ui->textInput->clear();
-    // Clear the current file path because this is a new document.
+    // Clear the current file path.
     currentFile.clear();
     // Reset the window title.
     setWindowTitle("MarkTex");
@@ -296,12 +303,30 @@ void MainWindow::openFile()
         "",
         "Markdown Files (*.md);;Text Files (*.txt);;All Files (*)"
         );
+
     // Stop if the user cancels the dialog.
     if (fileName.isEmpty())
     {
         return;
     }
-    // Create a QFile using the selected file path.
+    // Check if the current editor already contains text.
+    if (!ui->textInput->toPlainText().isEmpty())
+    {
+        // Create a new MarkTex window.
+        MainWindow *window = new MainWindow();
+        // Load the selected file into the new window.
+        window->loadFile(fileName);
+        // Show the new window.
+        window->show();
+        return;
+    }
+    // Load the file into the current window.
+    loadFile(fileName);
+}
+
+void MainWindow::loadFile(const QString &fileName)
+{
+    // Create a QFile using the file path.
     QFile file(fileName);
     // Try to open the file for reading.
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -319,13 +344,13 @@ void MainWindow::openFile()
     QTextStream in(&file);
     // Read the entire file and put it into the Markdown editor.
     ui->textInput->setPlainText(in.readAll());
-    // Close the file after reading it.
+    // Close the file after reading.
     file.close();
-    // Remember the path of the opened file.
+    // Remember the file path.
     currentFile = fileName;
     // Show the file name in the window title.
     setWindowTitle(
-        "MarkTex - " + QFileInfo(fileName).fileName()
+        "MarkTex: " + QFileInfo(fileName).fileName()
         );
 }
 
@@ -408,6 +433,12 @@ void MainWindow::exitApp()
 {
     // Close the MarkTex window.
     close();
+}
+
+void MainWindow::openNewWindow()
+{
+    MainWindow *window = new MainWindow();
+    window->show();
 }
 
 //destructor
