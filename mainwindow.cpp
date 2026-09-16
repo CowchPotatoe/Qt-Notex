@@ -22,7 +22,6 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    setupWindow();
     setupStatusBar();
     setupEditor();
     setupToolBar();
@@ -30,11 +29,6 @@ MainWindow::MainWindow(QWidget *parent)
     setupViewActions();
     setupInsertActions();
     setupFileActions();
-}
-
-void MainWindow::setupWindow()
-{
-    setWindowTitle("MarkTex");
 }
 
 void MainWindow::setupStatusBar()

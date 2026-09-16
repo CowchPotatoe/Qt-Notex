@@ -32,7 +32,6 @@ private:
     // Markdown parser.
     MarkdownParser parser;
 
-    void setupWindow();
     void setupStatusBar();
     void setupEditor();
     void setupToolBar();
