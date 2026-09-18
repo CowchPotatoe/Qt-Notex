@@ -19,6 +19,10 @@
   <property name="windowTitle">
    <string>MarkTek</string>
   </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../MarkTek.png</normaloff>../MarkTek.png</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <property name="sizePolicy">
     <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
