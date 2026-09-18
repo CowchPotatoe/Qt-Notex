@@ -21,7 +21,7 @@
   </property>
   <property name="windowIcon">
    <iconset>
-    <normaloff>../MarkTek.png</normaloff>../MarkTek.png</iconset>
+    <normaloff>resources/marktek.png</normaloff>resources/marktek.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="sizePolicy">
