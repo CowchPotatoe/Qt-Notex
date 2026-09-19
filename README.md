@@ -13,12 +13,11 @@ A Markdown editor built with **C++ and Qt** with live preview and PDF export.
 * Cursor position indicator
 
 ## Installation
-Notex is currently distributed as both an **AppImage** and a **tar.gz** package for 64-bit Linux systems.
+Notex is currently distributed as both an **AppImage** and a **tar.gz** package for **64-bit Linux (x86_64)** systems.
 
 ### AppImage
-The AppImage is the easiest way to run Notex without installing the application.
-1. Download:
-   `Notex-x86_64.AppImage`
+The AppImage is the easiest way to run Notex without installing it.
+1. Download `Notex-x86_64.AppImage`.
 2. Make the file executable:
    ```bash
    chmod +x Notex-x86_64.AppImage
@@ -27,13 +26,12 @@ The AppImage is the easiest way to run Notex without installing the application.
    ```bash
    ./Notex-x86_64.AppImage
    ```
-You can move the AppImage to another folder and run it from there.
-> Desktop application-menu integration and application icons may depend on your Linux desktop environment and AppImage integration support.
+The AppImage can be moved to another folder and run from there.
+> **Note:** The AppImage contains the Notex application, Qt libraries, plugins, and application icon. However, application-menu and dock integration can depend on the Linux desktop environment. Some desktop environments may require additional AppImage integration support for the application to appear as an installed application with its icon.
 
 ### tar.gz
-The tarball contains the Notex application, required Qt libraries, plugins, and installation scripts.
-1. Download:
-   `Notex-release.tar.gz`
+The tarball contains the Notex application, required Qt libraries, plugins, application icon, and installation scripts.
+1. Download `Notex-release.tar.gz`.
 2. Extract the archive:
    ```bash
    tar -xzf Notex-release.tar.gz
@@ -42,12 +40,12 @@ The tarball contains the Notex application, required Qt libraries, plugins, and 
    ```bash
    cd Notex-release
    ```
-4. Run the installer:
+4. Install the desktop launcher:
    ```bash
    ./install.sh
    ```
-The installer creates a desktop entry so Notex can appear in your application menu.
-You can also run Notex directly from the release directory:
+The installer creates a desktop entry in the user's application menu and registers the Notex icon.
+Notex can also be run directly from the release directory without installing the desktop launcher:
 ```bash
 ./run.sh
 ```
@@ -57,7 +55,7 @@ Notex is a personal C++/Qt project created to learn desktop GUI development, tex
 The project currently uses a custom, limited Markdown parser for the initial version, with plans to expand its Markdown and LaTeX support over time.
 
 ## Beta
-Notex is currently a beta project. Some features are incomplete and bugs may still exist.
+Notex is currently a beta project. Some features are incomplete, and bugs may still exist.
 
 ## License
 Notex is licensed under the **GNU Lesser General Public License, version 2.1 (LGPL-2.1)**.
