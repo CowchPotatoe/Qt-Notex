@@ -17,11 +17,11 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>MarkTek</string>
+   <string>Notex</string>
   </property>
   <property name="windowIcon">
-   <iconset>
-    <normaloff>resources/marktek.png</normaloff>resources/marktek.png</iconset>
+   <iconset resource="resources/resources.qrc">
+    <normaloff>:/notex.png</normaloff>:/notex.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="sizePolicy">
@@ -294,6 +294,8 @@
    </property>
   </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources/resources.qrc"/>
+ </resources>
  <connections/>
 </ui>
