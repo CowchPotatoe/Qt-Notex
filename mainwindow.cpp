@@ -431,8 +431,6 @@ void MainWindow::openDocument(const QString &fileName)
         // Use the file name as the tab title.
         QString tabName = QFileInfo(fileName).fileName();
         tabWidget->setTabText(tabWidget->currentIndex(), tabName);
-        // Update the window title.
-        setWindowTitle("Notex - " + tabName);
         return;
     }
     // Create a new document for the file.
@@ -453,8 +451,6 @@ void MainWindow::openDocument(const QString &fileName)
     // Update the cursor position whenever the cursor moves.
     connect(document->editor(), &QTextEdit::cursorPositionChanged,
             this, &MainWindow::updateCursorPosition);
-    // Update the window title.
-    setWindowTitle("Notex - " + tabName);
 }
 
 void MainWindow::openFromFileSystem(const QModelIndex &index)
@@ -509,8 +505,6 @@ void MainWindow::saveFile()
     // Update the tab title.
     QString tabName = QFileInfo(document->fileName()).fileName();
     tabWidget->setTabText(tabWidget->currentIndex(), tabName);
-    // Update the window title.
-    setWindowTitle("Notex - " + tabName);
 }
 
 void MainWindow::saveFileAs()
@@ -550,9 +544,6 @@ void MainWindow::saveFileAs()
     // Update the tab title.
     QString tabName = QFileInfo(fileName).fileName();
     tabWidget->setTabText(tabWidget->currentIndex(), tabName);
-    // Update the window title.
-    setWindowTitle(
-        "Notex - " + tabName);
 }
 
 void MainWindow::closeTab(int index)
@@ -584,17 +575,6 @@ void MainWindow::currentTabChanged(int index)
     }
     // Update the cursor position.
     updateCursorPosition();
-    // Update the window title.
-    if (document->fileName().isEmpty())
-    {
-        setWindowTitle("Notex");
-    }
-    else
-    {
-        setWindowTitle(
-            "Notex - " +
-            QFileInfo(document->fileName()).fileName());
-    }
 }
 
 void MainWindow::exportPDF()
