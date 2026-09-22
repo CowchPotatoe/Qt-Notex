@@ -249,7 +249,7 @@ void MainWindow::setupFileActions()
     // Export the preview as a PDF.
     connect(ui->actionExportPDF, &QAction::triggered,
             this, &MainWindow::exportPDF);
-    // Exit MarkTex.
+    // Exit Notex.
     connect(ui->actionExit, &QAction::triggered,
             this, &MainWindow::exitApp);
 }
@@ -482,7 +482,7 @@ void MainWindow::newTab()
     connect(document->editor(), &QTextEdit::cursorPositionChanged,
             this, &MainWindow::updateCursorPosition);
     // Reset the window title for an untitled document.
-    setWindowTitle("MarkTex");
+    setWindowTitle("Notex");
 }
 
 void MainWindow::saveFile()
@@ -552,7 +552,7 @@ void MainWindow::saveFileAs()
     tabWidget->setTabText(tabWidget->currentIndex(), tabName);
     // Update the window title.
     setWindowTitle(
-        "MarkTex - " + tabName);
+        "Notex - " + tabName);
 }
 
 void MainWindow::closeTab(int index)
@@ -710,7 +710,7 @@ void MainWindow::exportPDF()
 
 void MainWindow::exitApp()
 {
-    // Close the MarkTex window.
+    // Close the Notex window.
     close();
 }
 
