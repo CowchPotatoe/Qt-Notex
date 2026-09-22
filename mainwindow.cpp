@@ -190,7 +190,6 @@ void MainWindow::setupEditActions()
             this, [this]()
             {
                 DocumentWidget *document = currentDocument();
-
                 if (document != nullptr)
                 {
                     document->editor()->selectAll();
