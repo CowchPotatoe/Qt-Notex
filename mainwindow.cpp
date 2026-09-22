@@ -1,13 +1,23 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
+#include "documents.h"
+
+// File system.
+#include <QDir>
+#include <QFileSystemModel>
+#include <QTreeView>
+
+// Tabs and layout.
+#include <QSplitter>
+#include <QTabWidget>
 
 // File handling.
 #include <QFileDialog>
-#include <QFile>
 #include <QFileInfo>
-#include <QTextStream>
+
 // Messages.
 #include <QMessageBox>
+
 // PDF export.
 #include <QPdfWriter>
 #include <QPageSize>
@@ -16,19 +26,81 @@
 #include <QPainter>
 #include <QTextDocument>
 
+// Cursor and editor.
+#include <QTextCursor>
+#include <QTextEdit>
+
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+    : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
+    // Create the cursor label before creating the first tab.
     setupStatusBar();
-    setupEditor();
+    // Create the file system and tab workspace.
+    setupWorkspace();
+    // Create the menu options
     setupToolBar();
     setupEditActions();
     setupViewActions();
     setupInsertActions();
     setupFileActions();
+}
+
+void MainWindow::setupWorkspace()
+{
+    // Create the main horizontal splitter.
+    mainSplitter = new QSplitter(Qt::Horizontal);
+    // Create the file system tree.
+    fileTree = new QTreeView;
+    // Create the tab widget.
+    tabWidget = new QTabWidget;
+    // Add the file system and tabs to the splitter.
+    mainSplitter->addWidget(fileTree);
+    mainSplitter->addWidget(tabWidget);
+    // Allow the file system to be collapsed.
+    mainSplitter->setCollapsible(0, true);
+    // Keep the tab area visible.
+    mainSplitter->setCollapsible(1, false);
+    // Give the file system a smaller starting width.
+    mainSplitter->setSizes({100, 1000});
+    // Let the tab area take most of the available space.
+    mainSplitter->setStretchFactor(0, 0);
+    mainSplitter->setStretchFactor(1, 1);
+    // Use the new workspace as the central widget.
+    setCentralWidget(mainSplitter);
+    // Create the file system model.
+    fileModel = new QFileSystemModel(this);
+    // Start the file system at the user's home directory.
+    QString rootPath = QDir::homePath();
+    // Set the root path for the model.
+    fileModel->setRootPath(rootPath);
+    // Give the tree the file system model.
+    fileTree->setModel(fileModel);
+    // Start the tree at the home directory.
+    fileTree->setRootIndex(fileModel->index(rootPath));
+    // Hide extra file information.
+    fileTree->setColumnHidden(1, true);
+    fileTree->setColumnHidden(2, true);
+    fileTree->setColumnHidden(3, true);
+    // Hide the header.
+    fileTree->setHeaderHidden(true);
+    // Open files from the file system when double-clicked.
+    connect(fileTree, &QTreeView::doubleClicked,
+            this, &MainWindow::openFromFileSystem);
+    // Make the tabs look more like a document editor.
+    tabWidget->setDocumentMode(true);
+    // Allow tabs to be closed.
+    tabWidget->setTabsClosable(true);
+    // Allow tabs to be moved.
+    tabWidget->setMovable(true);
+    // Close a tab when its close button is clicked.
+    connect(tabWidget, &QTabWidget::tabCloseRequested,
+            this, &MainWindow::closeTab);
+    // Update the window when the current tab changes.
+    connect(tabWidget, &QTabWidget::currentChanged,
+            this, &MainWindow::currentTabChanged);
+    // Create the first document tab.
+    newTab();
 }
 
 void MainWindow::setupStatusBar()
@@ -39,49 +111,90 @@ void MainWindow::setupStatusBar()
     ui->statusbar->addPermanentWidget(cursorPosition);
 }
 
-void MainWindow::setupEditor()
-{
-    // Distinguish between editor and preview
-    ui->textInput->setPlaceholderText("Start writing in Markdown...");
-    // Update preview when text changes.
-    connect(ui->textInput, &QTextEdit::textChanged,
-            this, &MainWindow::updatePreview);
-    // Update the cursor position whenever the cursor moves.
-    connect(ui->textInput, &QTextEdit::cursorPositionChanged,
-            this, &MainWindow::updateCursorPosition);
-    updatePreview();
-}
-
 void MainWindow::setupToolBar()
 {
     // Undo.
     connect(ui->actionUndo, &QAction::triggered,
-            ui->textInput, &QTextEdit::undo);
+            this, [this]()
+            {
+                DocumentWidget *document = currentDocument();
+                if (document != nullptr)
+                {
+                    document->editor()->undo();
+                } });
     // Redo.
     connect(ui->actionRedo, &QAction::triggered,
-            ui->textInput, &QTextEdit::redo);
+            this, [this]()
+            {
+                DocumentWidget *document = currentDocument();
+
+                if (document != nullptr)
+                {
+                    document->editor()->redo();
+                } });
 }
 
 void MainWindow::setupEditActions()
 {
     // Undo.
     connect(ui->actionUndo2, &QAction::triggered,
-            ui->textInput, &QTextEdit::undo);
+            this, [this]()
+            {
+                DocumentWidget *document = currentDocument();
+
+                if (document != nullptr)
+                {
+                    document->editor()->undo();
+                } });
     // Redo.
     connect(ui->actionRedo2, &QAction::triggered,
-            ui->textInput, &QTextEdit::redo);
+            this, [this]()
+            {
+                DocumentWidget *document = currentDocument();
+
+                if (document != nullptr)
+                {
+                    document->editor()->redo();
+                } });
     // Cut.
     connect(ui->actionCut, &QAction::triggered,
-            ui->textInput, &QTextEdit::cut);
+            this, [this]()
+            {
+                DocumentWidget *document = currentDocument();
+
+                if (document != nullptr)
+                {
+                    document->editor()->cut();
+                } });
     // Copy.
     connect(ui->actionCopy, &QAction::triggered,
-            ui->textInput, &QTextEdit::copy);
+            this, [this]()
+            {
+                DocumentWidget *document = currentDocument();
+
+                if (document != nullptr)
+                {
+                    document->editor()->copy();
+                } });
     // Paste.
     connect(ui->actionPaste, &QAction::triggered,
-            ui->textInput, &QTextEdit::paste);
+            this, [this]()
+            {
+                DocumentWidget *document = currentDocument();
+                if (document != nullptr)
+                {
+                    document->editor()->paste();
+                } });
     // Select all.
     connect(ui->actionSelectAll, &QAction::triggered,
-            ui->textInput, &QTextEdit::selectAll);
+            this, [this]()
+            {
+                DocumentWidget *document = currentDocument();
+
+                if (document != nullptr)
+                {
+                    document->editor()->selectAll();
+                } });
     // Clear text.
     connect(ui->actionClear, &QAction::triggered,
             this, &MainWindow::clearText);
@@ -141,159 +254,127 @@ void MainWindow::setupFileActions()
             this, &MainWindow::exitApp);
 }
 
-void MainWindow::updatePreview()
+DocumentWidget *MainWindow::currentDocument() const
 {
-    // Get the text from textInput.
-    QString text = ui->textInput->toPlainText();
-    // Check if the editor is empty.
-    if (text.isEmpty())
-    {
-        QString text =
-            "<p style='font-size: " + QString::number(zoomLevel) +
-            "pt;'>Your Markdown preview will appear here.</p>";
-
-        ui->preview->setHtml(text);
-        return;
-    }
-    // Convert the Markdown input to HTML.
-    QString html = parser.parse(text);
-    // Apply the zoom level to the preview.
-    html = "<div style='font-size: " + QString::number(zoomLevel) +
-           "pt;'>" + html + "</div>";
-    // Display the HTML.
-    ui->preview->setHtml(html);
+    // Get the document currently displayed in the active tab.
+    return qobject_cast<DocumentWidget *>(
+        tabWidget->currentWidget());
 }
 
 void MainWindow::updateCursorPosition()
 {
+    // Get the current document.
+    DocumentWidget *document = currentDocument();
+    if (document == nullptr)
+    {
+        return;
+    }
     // Get the current cursor from the text editor.
-    QTextCursor cursor = ui->textInput->textCursor();
+    QTextCursor cursor = document->editor()->textCursor();
     // Get the current line number.
     int line = cursor.blockNumber() + 1;
     // Get the current column number.
     int column = cursor.positionInBlock() + 1;
     // Create the status text.
-    QString position = "Ln " + QString::number(line)
-                       + ", Col " + QString::number(column);
+    QString position = "Ln " + QString::number(line) + ", Col " + QString::number(column);
     // Display the cursor position.
     cursorPosition->setText(position);
 }
 
 void MainWindow::clearText()
 {
-    ui->textInput->clear();
+    // Get the current document.
+    DocumentWidget *document = currentDocument();
+    if (document != nullptr)
+    {
+        document->clearText();
+    }
 }
 
 void MainWindow::Markdown()
 {
-    ui->textInput->show();
-    ui->preview->hide();
+    // Get the current document.
+    DocumentWidget *document = currentDocument();
+    if (document != nullptr)
+    {
+        document->showMarkdown();
+    }
 }
 
 void MainWindow::Preview()
 {
-    ui->textInput->hide();
-    ui->preview->show();
+    // Get the current document.
+    DocumentWidget *document = currentDocument();
+    if (document != nullptr)
+    {
+        document->showPreview();
+    }
 }
 
 void MainWindow::Split()
 {
-    ui->textInput->show();
-    ui->preview->show();
+    // Get the current document.
+    DocumentWidget *document = currentDocument();
+    if (document != nullptr)
+    {
+        document->showSplit();
+    }
 }
 
 void MainWindow::zoomIn()
 {
-    zoomLevel += 1;
-    QFont font = ui->textInput->font();
-    font.setPointSize(zoomLevel);
-    ui->textInput->setFont(font);
-    updatePreview();
+    // Get the current document.
+    DocumentWidget *document = currentDocument();
+    if (document != nullptr)
+    {
+        document->zoomIn();
+    }
 }
 
 void MainWindow::zoomOut()
 {
-    if (zoomLevel > 6)
+    // Get the current document.
+    DocumentWidget *document = currentDocument();
+    if (document != nullptr)
     {
-        zoomLevel -= 1;
-        QFont font = ui->textInput->font();
-        font.setPointSize(zoomLevel);
-        ui->textInput->setFont(font);
-        updatePreview();
+        document->zoomOut();
     }
 }
 
 void MainWindow::resetZoom()
 {
-    zoomLevel = 12;
-    QFont font = ui->textInput->font();
-    font.setPointSize(zoomLevel);
-    ui->textInput->setFont(font);
-    updatePreview();
+    // Get the current document.
+    DocumentWidget *document = currentDocument();
+    if (document != nullptr)
+    {
+        document->resetZoom();
+    }
 }
 
 void MainWindow::insertBold()
 {
-    // Get the current text cursor from the Markdown editor.
-    QTextCursor cursor = ui->textInput->textCursor();
-    // Check if the user has selected any text.
-    if (cursor.hasSelection())
+    // Get the current document.
+    DocumentWidget *document = currentDocument();
+    if (document != nullptr)
     {
-        // Get the selected text.
-        QString selectedText = cursor.selectedText();
-        // Replace the selected text with Markdown bold syntax.
-        cursor.insertText("**" + selectedText + "**");
-    }
-    else
-    {
-        // Insert an empty pair of bold markers.
-        cursor.insertText("****");
-        // Move the cursor left twice so it is between the markers.
-        cursor.movePosition(QTextCursor::Left);
-        cursor.movePosition(QTextCursor::Left);
-        // Update the editor's cursor to the new position.
-        ui->textInput->setTextCursor(cursor);
+        document->insertBold();
     }
 }
 
 void MainWindow::insertItalic()
 {
-    // Get the current text cursor from the Markdown editor.
-    QTextCursor cursor = ui->textInput->textCursor();
-    // Check if the user has selected any text.
-    if (cursor.hasSelection())
+    // Get the current document.
+    DocumentWidget *document = currentDocument();
+    if (document != nullptr)
     {
-        // Get the selected text.
-        QString selectedText = cursor.selectedText();
-        // Replace the selected text with Markdown italic syntax.
-        cursor.insertText("*" + selectedText + "*");
-    }
-    else
-    {
-        // Insert an empty pair of italic markers.
-        cursor.insertText("**");
-        // Move the cursor left once so it is between the markers.
-        cursor.movePosition(QTextCursor::Left);
-        // Update the editor's cursor to the new position.
-        ui->textInput->setTextCursor(cursor);
+        document->insertItalic();
     }
 }
 
 void MainWindow::newFile()
 {
-    // Check if the Markdown editor already contains text.
-    if (!ui->textInput->toPlainText().isEmpty())
-    {
-        // Open a new MarkTex window instead of deleting the current text.
-        openNewWindow();
-        return;
-    }
-    // Clear the editor if it is already empty.
-    ui->textInput->clear();
-    // Clear the current file path.
-    currentFile.clear();
-    // Reset the window title.
-    setWindowTitle("MarkTex");
+    // Create a new tab instead of a new window.
+    newTab();
 }
 
 void MainWindow::openFile()
@@ -303,132 +384,217 @@ void MainWindow::openFile()
         this,
         "Open Markdown File",
         "",
-        "Markdown Files (*.md);;Text Files (*.txt);;All Files (*)"
-        );
+        "Markdown Files (*.md);;Text Files (*.txt);;All Files (*)");
 
     // Stop if the user cancels the dialog.
     if (fileName.isEmpty())
     {
         return;
     }
-    // Check if the current editor already contains text.
-    if (!ui->textInput->toPlainText().isEmpty())
-    {
-        // Create a new MarkTex window.
-        MainWindow *window = new MainWindow();
-        // Load the selected file into the new window.
-        window->loadFile(fileName);
-        // Show the new window.
-        window->show();
-        return;
-    }
-    // Load the file into the current window.
-    loadFile(fileName);
+    // Open the file in a tab.
+    openDocument(fileName);
 }
 
-void MainWindow::loadFile(const QString &fileName)
+void MainWindow::openDocument(const QString &fileName)
 {
-    // Create a QFile using the file path.
-    QFile file(fileName);
-    // Try to open the file for reading.
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    // Check if the file is already open in another tab.
+    for (int i = 0; i < tabWidget->count(); i++)
     {
-        // Show an error if the file could not be opened.
-        QMessageBox::warning(
-            this,
-            "MarkTex",
-            "Could not open the file."
-            );
+        DocumentWidget *document =
+            qobject_cast<DocumentWidget *>(tabWidget->widget(i));
+        if (document != nullptr &&
+            document->fileName() == fileName)
+        {
+            // Switch to the tab if the file is already open.
+            tabWidget->setCurrentIndex(i);
 
+            return;
+        }
+    }
+    // Get the current document.
+    DocumentWidget *current = currentDocument();
+    // Reuse the first empty tab when possible.
+    if (current != nullptr &&
+        current->fileName().isEmpty() &&
+        current->getText().isEmpty())
+    {
+        // Load the file into the current tab.
+        if (!current->loadFile(fileName))
+        {
+            // Show an error if the file could not be opened.
+            QMessageBox::warning(
+                this,
+                "Notex",
+                "Could not open the file.");
+            return;
+        }
+        // Use the file name as the tab title.
+        QString tabName = QFileInfo(fileName).fileName();
+        tabWidget->setTabText(tabWidget->currentIndex(), tabName);
+        // Update the window title.
+        setWindowTitle("Notex - " + tabName);
         return;
     }
-    // Create a text stream for reading the file.
-    QTextStream in(&file);
-    // Read the entire file and put it into the Markdown editor.
-    ui->textInput->setPlainText(in.readAll());
-    // Close the file after reading.
-    file.close();
-    // Remember the file path.
-    currentFile = fileName;
-    // Show the file name in the window title.
-    setWindowTitle(
-        "MarkTex: " + QFileInfo(fileName).fileName()
-        );
+    // Create a new document for the file.
+    DocumentWidget *document = new DocumentWidget;
+    // Load the selected file into the new document.
+    if (!document->loadFile(fileName))
+    {
+        // Show an error if the file could not be opened.
+        QMessageBox::warning(this, "Notex", "Could not open the file.");
+        delete document;
+        return;
+    }
+    // Use the file name as the tab title.
+    QString tabName = QFileInfo(fileName).fileName();
+    int index = tabWidget->addTab(document, tabName);
+    // Make the newly opened document active.
+    tabWidget->setCurrentIndex(index);
+    // Update the cursor position whenever the cursor moves.
+    connect(document->editor(), &QTextEdit::cursorPositionChanged,
+            this, &MainWindow::updateCursorPosition);
+    // Update the window title.
+    setWindowTitle("Notex - " + tabName);
+}
+
+void MainWindow::openFromFileSystem(const QModelIndex &index)
+{
+    // Stop if the selected item is a directory.
+    if (fileModel->isDir(index))
+    {
+        return;
+    }
+    // Get the path of the selected file.
+    QString fileName = fileModel->filePath(index);
+    // Open the file in a tab.
+    openDocument(fileName);
+}
+
+void MainWindow::newTab()
+{
+    // Create a new document.
+    DocumentWidget *document = new DocumentWidget;
+    // Add the document as a new tab.
+    int index = tabWidget->addTab(document, "Untitled");
+    // Make the new tab active.
+    tabWidget->setCurrentIndex(index);
+    // Update the cursor position whenever the cursor moves.
+    connect(document->editor(), &QTextEdit::cursorPositionChanged,
+            this, &MainWindow::updateCursorPosition);
+    // Reset the window title for an untitled document.
+    setWindowTitle("MarkTex");
 }
 
 void MainWindow::saveFile()
 {
+    // Get the current document.
+    DocumentWidget *document = currentDocument();
+    if (document == nullptr)
+    {
+        return;
+    }
     // If there is no current file, use Save As instead.
-    if (currentFile.isEmpty())
+    if (document->fileName().isEmpty())
     {
         saveFileAs();
         return;
     }
-    // Create a QFile using the current file path.
-    QFile file(currentFile);
-    // Try to open the file for writing.
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+    // Save the current document.
+    if (!document->saveFile(document->fileName()))
     {
-        // Show an error if the file could not be opened.
-        QMessageBox::warning(
-            this,
-            "MarkTex",
-            "Could not save the file."
-            );
-
+        // Show an error if the file could not be saved.
+        QMessageBox::warning(this, "Notex", "Could not save the file.");
         return;
     }
-    // Create a text stream for writing to the file.
-    QTextStream out(&file);
-    // Write the Markdown editor's contents to the file.
-    out << ui->textInput->toPlainText();
-    // Close the file after saving.
-    file.close();
+    // Update the tab title.
+    QString tabName = QFileInfo(document->fileName()).fileName();
+    tabWidget->setTabText(tabWidget->currentIndex(), tabName);
     // Update the window title.
-    setWindowTitle(
-        "MarkTex - " + QFileInfo(currentFile).fileName()
-        );
+    setWindowTitle("Notex - " + tabName);
 }
 
 void MainWindow::saveFileAs()
 {
+    // Get the current document.
+    DocumentWidget *document = currentDocument();
+    if (document == nullptr)
+    {
+        return;
+    }
     // Open a file selection dialog for choosing a save location.
     QString fileName = QFileDialog::getSaveFileName(
         this,
         "Save Markdown File",
         "",
-        "Markdown Files (*.md);;Text Files (*.txt);;All Files (*)"
-        );
+        "Markdown Files (*.md);;Text Files (*.txt);;All Files (*)");
     // Stop if the user cancels the dialog.
     if (fileName.isEmpty())
     {
         return;
     }
-    // Create a QFile using the selected file path.
-    QFile file(fileName);
-    // Try to open the file for writing.
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+    // Add .md if the user did not provide an extension.
+    if (!fileName.endsWith(".md", Qt::CaseInsensitive))
     {
-        // Show an error if the file could not be opened.
+        fileName += ".md";
+    }
+    // Save the document.
+    if (!document->saveFile(fileName))
+    {
+        // Show an error if the file could not be saved.
         QMessageBox::warning(
             this,
-            "MarkTex",
-            "Could not save the file."
-            );
+            "Notex",
+            "Could not save the file.");
         return;
     }
-    // Create a text stream for writing to the file.
-    QTextStream out(&file);
-    // Write the Markdown editor's contents to the file.
-    out << ui->textInput->toPlainText();
-    // Close the file after saving.
-    file.close();
-    // Remember this as the current file.
-    currentFile = fileName;
-    // Show the file name in the window title.
+    // Update the tab title.
+    QString tabName = QFileInfo(fileName).fileName();
+    tabWidget->setTabText(tabWidget->currentIndex(), tabName);
+    // Update the window title.
     setWindowTitle(
-        "MarkTex - " + QFileInfo(currentFile).fileName()
-        );
+        "MarkTex - " + tabName);
+}
+
+void MainWindow::closeTab(int index)
+{
+    // Get the widget inside the tab.
+    QWidget *widget = tabWidget->widget(index);
+    // Remove the tab.
+    tabWidget->removeTab(index);
+    // Delete the document.
+    delete widget;
+    // Keep one tab open.
+    if (tabWidget->count() == 0)
+    {
+        newTab();
+    }
+}
+
+void MainWindow::currentTabChanged(int index)
+{
+    if (index < 0)
+    {
+        return;
+    }
+    // Get the currently selected document.
+    DocumentWidget *document = currentDocument();
+    if (document == nullptr)
+    {
+        return;
+    }
+    // Update the cursor position.
+    updateCursorPosition();
+    // Update the window title.
+    if (document->fileName().isEmpty())
+    {
+        setWindowTitle("Notex");
+    }
+    else
+    {
+        setWindowTitle(
+            "Notex - " +
+            QFileInfo(document->fileName()).fileName());
+    }
 }
 
 void MainWindow::exportPDF()
@@ -438,8 +604,7 @@ void MainWindow::exportPDF()
         this,
         "Export PDF",
         "",
-        "PDF Files (*.pdf)"
-        );
+        "PDF Files (*.pdf)");
     // Stop if the user cancels the dialog.
     if (fileName.isEmpty())
     {
@@ -450,22 +615,25 @@ void MainWindow::exportPDF()
     {
         fileName += ".pdf";
     }
-
+    // Get the current document.
+    DocumentWidget *document = currentDocument();
+    if (document == nullptr)
+    {
+        return;
+    }
     // Get the Markdown text from the editor.
-    QString markdown = ui->textInput->toPlainText();
+    QString markdown = document->getText();
     // Stop if there is nothing to export.
     if (markdown.isEmpty())
     {
         QMessageBox::information(
             this,
-            "MarkTex",
-            "There is no Markdown to export."
-            );
-
+            "Notex",
+            "There is no Markdown to export.");
         return;
     }
     // use the parsed html
-    QString html = parser.parse(markdown);
+    QString html = document->getHtml();
     // Add PDF-specific formatting.
     html =
         "<html>"
@@ -509,8 +677,8 @@ void MainWindow::exportPDF()
 
         "</style>"
         "</head>"
-        "<body>"
-        + html +
+        "<body>" +
+        html +
         "</body>"
         "</html>";
     // Create the PDF writer.
@@ -523,22 +691,19 @@ void MainWindow::exportPDF()
     QPageLayout layout(
         QPageSize(QPageSize::A4),
         QPageLayout::Portrait,
-        margins
-        );
+        margins);
     // Apply the page layout to the PDF.
     pdf.setPageLayout(layout);
     // Create the text document.
-    QTextDocument document;
+    QTextDocument documentPDF;
     // Load the formatted HTML into the document.
-    document.setHtml(html);
+    documentPDF.setHtml(html);
     // Set the document size to the printable area.
-    document.setPageSize(
-        pdf.pageLayout().paintRect(QPageLayout::Point).size()
-        );
+    documentPDF.setPageSize(pdf.pageLayout().paintRect(QPageLayout::Point).size());
     // Create a painter for the PDF.
     QPainter painter(&pdf);
     // Draw the document onto the PDF.
-    document.drawContents(&painter);
+    documentPDF.drawContents(&painter);
     // Finish writing the PDF.
     painter.end();
 }
@@ -549,13 +714,7 @@ void MainWindow::exitApp()
     close();
 }
 
-void MainWindow::openNewWindow()
-{
-    MainWindow *window = new MainWindow();
-    window->show();
-}
-
-//destructor
+// destructor
 MainWindow::~MainWindow()
 {
     delete ui;

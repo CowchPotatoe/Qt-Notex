@@ -4,13 +4,17 @@
 #include <QMainWindow>
 #include <QLabel>
 
-#include "markdownparser.h"
-
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
 }
 QT_END_NAMESPACE
+
+class QFileSystemModel;
+class QSplitter;
+class QTabWidget;
+class QTreeView;
+class DocumentWidget;
 
 class MainWindow : public QMainWindow
 {
@@ -23,26 +27,30 @@ public:
 private:
     Ui::MainWindow *ui;
 
-    // Stores the path of the currently open file.
-    QString currentFile;
-    // Default zoom
-    int zoomLevel = 12;
+    // File system model used by the file tree.
+    QFileSystemModel *fileModel;
+    // File system tree.
+    QTreeView *fileTree;
+    // Main splitter between the file system and tabs.
+    QSplitter *mainSplitter;
+    // Tab widget containing open documents.
+    QTabWidget *tabWidget;
     // cursor
     QLabel *cursorPosition;
-    // Markdown parser.
-    MarkdownParser parser;
 
+    void setupWorkspace();
     void setupStatusBar();
-    void setupEditor();
     void setupToolBar();
     void setupEditActions();
     void setupViewActions();
     void setupInsertActions();
     void setupFileActions();
 
-    void updatePreview();
+    // Get the document currently open in the active tab.
+    DocumentWidget *currentDocument() const;
+
     void updateCursorPosition();
-    void openNewWindow();
+
     // Edit operations
     void clearText();
     // View operations
@@ -58,11 +66,16 @@ private:
     // File operations.
     void newFile();
     void openFile();
-    void loadFile(const QString &fileName);
     void saveFile();
     void saveFileAs();
     void exportPDF();
     void exitApp();
-
+    // Tab operations.
+    void newTab();
+    void openDocument(const QString &fileName);
+    void openFromFileSystem(const QModelIndex &index);
+    void closeTab(int index);
+    void currentTabChanged(int index);
 };
+
 #endif // MAINWINDOW_H
