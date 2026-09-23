@@ -75,6 +75,8 @@
     <addaction name="actionZoomIn"/>
     <addaction name="actionZoomOut"/>
     <addaction name="actionResetZoom"/>
+    <addaction name="separator"/>
+    <addaction name="actionDarkMode"/>
    </widget>
    <widget class="QMenu" name="menuInsert">
     <property name="title">
@@ -273,6 +275,11 @@
   <action name="actionExportPDF">
    <property name="text">
     <string>Export PDF</string>
+   </property>
+  </action>
+  <action name="actionDarkMode">
+   <property name="text">
+    <string>Dark Mode</string>
    </property>
   </action>
  </widget>

@@ -40,6 +40,8 @@ DocumentWidget::DocumentWidget(QWidget *parent)
     // Update preview when text changes.
     connect(textInput, &QTextEdit::textChanged,
             this, &DocumentWidget::updatePreview);
+    // Start with dark mode.
+    setDarkMode(false);
 }
 
 QTextEdit *DocumentWidget::editor() const
@@ -237,17 +239,178 @@ void DocumentWidget::updatePreview()
 {
     // Get the text from textInput.
     QString text = textInput->toPlainText();
-    // Clear the preview when the document is empty.
+
+    // Check if the editor is empty.
     if (text.isEmpty())
     {
-        preview->clear();
+        preview->setHtml(
+            renderHtml(
+                "<p>Your Markdown preview will appear here.</p>"
+                )
+            );
         return;
     }
     // Convert the Markdown input to HTML.
     QString html = parser.parse(text);
     // Apply the zoom level to the preview.
-    html = "<div style='font-size: " + QString::number(zoomLevel) +
-           "pt;'>" + html + "</div>";
+    html = "<div style='font-size: " +
+           QString::number(zoomLevel) +
+           "pt;'>" +
+           html +
+           "</div>";
+    // Apply the current theme.
+    html = renderHtml(html);
     // Display the HTML.
     preview->setHtml(html);
+}
+
+
+void DocumentWidget::setDarkMode(bool darkMode)
+{
+    // Store the current theme.
+    this->darkMode = darkMode;
+    // Dark theme.
+    if (darkMode)
+    {
+        textInput->setStyleSheet(
+            "QTextEdit {"
+            "    background-color: #1c1c1c;"
+            "    color: #dadada;"
+            "    border: 1px solid #333333;"
+            "    selection-background-color: #483b5c;"
+            "    selection-color: #ffffff;"
+            "}"
+            );
+        preview->setStyleSheet(
+            "QTextBrowser {"
+            "    background-color: #1c1c1c;"
+            "    color: #dadada;"
+            "    border: 1px solid #333333;"
+            "}"
+            );
+    }
+    // Light theme.
+    else
+    {
+        textInput->setStyleSheet(
+            "QTextEdit {"
+            "    background-color: #ffffff;"
+            "    color: #222222;"
+            "    border: 1px solid #dddddd;"
+            "    selection-background-color: #d9cfff;"
+            "    selection-color: #222222;"
+            "}"
+            );
+        preview->setStyleSheet(
+            "QTextBrowser {"
+            "    background-color: #ffffff;"
+            "    color: #222222;"
+            "    border: 1px solid #dddddd;"
+            "}"
+            );
+    }
+    // Re-render the preview using the new theme.
+    updatePreview();
+}
+
+QString DocumentWidget::renderHtml(const QString &html) const
+{
+    QString css;
+
+    // Dark theme.
+    if (darkMode)
+    {
+        css =
+            "<style>"
+            "body {"
+            "    background-color: #1c1c1c;"
+            "    color: #dadada;"
+            "    font-family: sans-serif;"
+            "}"
+
+            "h1, h2, h3, h4, h5, h6 {"
+            "    color: #f0f0f0;"
+            "}"
+
+            "a {"
+            "    color: #a882ff;"
+            "}"
+
+            "code {"
+            "    background-color: #282828;"
+            "    color: #dadada;"
+            "}"
+
+            "pre {"
+            "    background-color: #282828;"
+            "    color: #dadada;"
+            "    padding: 10px;"
+            "}"
+
+            "blockquote {"
+            "    color: #b3b3b3;"
+            "    border-left: 3px solid #a882ff;"
+            "    padding-left: 10px;"
+            "}"
+
+            "hr {"
+            "    border: 0;"
+            "    border-top: 1px solid #333333;"
+            "}"
+            "</style>";
+    }
+    // Light theme.
+    else
+    {
+        css =
+            "<style>"
+            "body {"
+            "    background-color: #ffffff;"
+            "    color: #222222;"
+            "    font-family: sans-serif;"
+            "}"
+
+            "h1, h2, h3, h4, h5, h6 {"
+            "    color: #222222;"
+            "}"
+
+            "a {"
+            "    color: #7852ee;"
+            "}"
+
+            "code {"
+            "    background-color: #f2f2f2;"
+            "    color: #222222;"
+            "}"
+
+            "pre {"
+            "    background-color: #f2f2f2;"
+            "    color: #222222;"
+            "    padding: 10px;"
+            "}"
+
+            "blockquote {"
+            "    color: #666666;"
+            "    border-left: 3px solid #7852ee;"
+            "    padding-left: 10px;"
+            "}"
+
+            "hr {"
+            "    border: 0;"
+            "    border-top: 1px solid #dddddd;"
+            "}"
+            "</style>";
+    }
+    // Add the CSS around the parsed HTML.
+    QString renderedHtml =
+        "<html>"
+        "<head>"
+        + css +
+        "</head>"
+        "<body>"
+        + html +
+        "</body>"
+        "</html>";
+
+    return renderedHtml;
 }

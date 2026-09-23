@@ -2,6 +2,7 @@
 #include "./ui_mainwindow.h"
 #include "documents.h"
 
+#include <QApplication>
 // File system.
 #include <QDir>
 #include <QFileSystemModel>
@@ -38,6 +39,8 @@ MainWindow::MainWindow(QWidget *parent)
     setupStatusBar();
     // Create the file system and tab workspace.
     setupWorkspace();
+    // Apply theme
+    applyTheme();
     // Create the menu options
     setupToolBar();
     setupEditActions();
@@ -111,6 +114,220 @@ void MainWindow::setupStatusBar()
     ui->statusbar->addPermanentWidget(cursorPosition);
 }
 
+void MainWindow::applyTheme()
+{
+    if (darkMode)
+    {
+        // Apply the dark theme to the entire application.
+        qApp->setStyleSheet(
+            "QMainWindow {"
+            "    background-color: #1c1c1c;"
+            "    color: #dadada;"
+            "}"
+            "QWidget {"
+            "    background-color: #1c1c1c;"
+            "    color: #dadada;"
+            "}"
+            // Menu bar.
+            "QMenuBar {"
+            "    background-color: #212121;"
+            "    color: #dadada;"
+            "}"
+            "QMenuBar::item:selected {"
+            "    background-color: #282828;"
+            "}"
+            // Menus.
+            "QMenu {"
+            "    background-color: #212121;"
+            "    color: #dadada;"
+            "    border: 1px solid #333333;"
+            "}"
+            "QMenu::item:selected {"
+            "    background-color: #333333;"
+            "}"
+            // Toolbar.
+            "QToolBar {"
+            "    background-color: #212121;"
+            "    border: none;"
+            "    border-bottom: 1px solid #333333;"
+            "}"
+            "QToolButton {"
+            "    background-color: transparent;"
+            "    color: #dadada;"
+            "}"
+            "QToolButton:hover {"
+            "    background-color: #282828;"
+            "}"
+            // File system.
+            "QTreeView {"
+            "    background-color: #212121;"
+            "    color: #dadada;"
+            "    border: none;"
+            "}"
+            "QTreeView::item:hover {"
+            "    background-color: #282828;"
+            "}"
+            "QTreeView::item:selected {"
+            "    background-color: #333333;"
+            "    color: #ffffff;"
+            "}"
+            // Tabs.
+            "QTabWidget {"
+            "    background-color: #1c1c1c;"
+            "    border: none;"
+            "}"
+            "QTabWidget::pane {"
+            "    background-color: #1c1c1c;"
+            "    border: none;"
+            "}"
+            "QTabWidget::tab-bar {"
+            "    background-color: #212121;"
+            "}"
+            "QTabBar {"
+            "    background-color: #212121;"
+            "    border: none;"
+            "}"
+            "QTabBar::tab {"
+            "    background-color: #212121;"
+            "    color: #999999;"
+            "    padding: 7px 12px;"
+            "}"
+            "QTabBar::tab:hover {"
+            "    background-color: #282828;"
+            "    color: #dadada;"
+            "}"
+            "QTabBar::tab:selected {"
+            "    background-color: #1c1c1c;"
+            "    color: #dadada;"
+            "}"
+            // Splitter.
+            "QSplitter::handle {"
+            "    background-color: #333333;"
+            "}"
+            "QSplitter::handle:hover {"
+            "    background-color: #555555;"
+            "}"
+            // Status bar.
+            "QStatusBar {"
+            "    background-color: #212121;"
+            "    color: #999999;"
+            "    border-top: 1px solid #333333;"
+            "}"
+            );
+    }
+    else
+    {
+        // Apply the light theme to the entire application.
+        qApp->setStyleSheet(
+            "QMainWindow {"
+            "    background-color: #ffffff;"
+            "    color: #222222;"
+            "}"
+            "QWidget {"
+            "    background-color: #ffffff;"
+            "    color: #222222;"
+            "}"
+            // Menu bar.
+            "QMenuBar {"
+            "    background-color: #f6f6f6;"
+            "    color: #222222;"
+            "}"
+            "QMenuBar::item:selected {"
+            "    background-color: #eeeeee;"
+            "}"
+
+            // Menus.
+            "QMenu {"
+            "    background-color: #ffffff;"
+            "    color: #222222;"
+            "    border: 1px solid #dddddd;"
+            "}"
+
+            "QMenu::item:selected {"
+            "    background-color: #eeeeee;"
+            "}"
+            // Toolbar.
+            "QToolBar {"
+            "    background-color: #f6f6f6;"
+            "    border: none;"
+            "    border-bottom: 1px solid #dddddd;"
+            "}"
+            "QToolButton {"
+            "    background-color: transparent;"
+            "    color: #222222;"
+            "}"
+            "QToolButton:hover {"
+            "    background-color: #eeeeee;"
+            "}"
+            // File system.
+            "QTreeView {"
+            "    background-color: #f6f6f6;"
+            "    color: #222222;"
+            "    border: none;"
+            "}"
+
+            "QTreeView::item:hover {"
+            "    background-color: #eeeeee;"
+            "}"
+
+            "QTreeView::item:selected {"
+            "    background-color: #dddddd;"
+            "    color: #222222;"
+            "}"
+            // Tabs.
+            "QTabWidget {"
+            "    background-color: #ffffff;"
+            "    border: none;"
+            "}"
+            "QTabWidget::pane {"
+            "    background-color: #ffffff;"
+            "    border: 0px;"
+            "}"
+            "QTabWidget::tab-bar {"
+            "    background-color: #f6f6f6;"
+            "}"
+            "QTabBar {"
+            "    background-color: #f6f6f6;"
+            "    border: none;"
+            "}"
+            "QTabBar::tab {"
+            "    background-color: #f6f6f6;"
+            "    color: #707070;"
+            "    padding: 7px 12px;"
+            "}"
+            "QTabBar::tab:hover {"
+            "    background-color: #eeeeee;"
+            "    color: #222222;"
+            "}"
+            "QTabBar::tab:selected {"
+            "    background-color: #ffffff;"
+            "    color: #222222;"
+            "}"
+            // Splitter.
+            "QSplitter::handle {"
+            "    background-color: #dddddd;"
+            "}"
+            // Status bar.
+            "QStatusBar {"
+            "    background-color: #f6f6f6;"
+            "    color: #707070;"
+            "    border-top: 1px solid #dddddd;"
+            "}"
+            );
+    }
+    // Apply the same theme to every open document.
+    for (int i = 0; i < tabWidget->count(); i++)
+    {
+        DocumentWidget *document =
+            qobject_cast<DocumentWidget *>(
+                tabWidget->widget(i)
+                );
+        if (document != nullptr)
+        {
+            document->setDarkMode(darkMode);
+        }
+    }
+}
 void MainWindow::setupToolBar()
 {
     // Undo.
@@ -141,7 +358,6 @@ void MainWindow::setupEditActions()
             this, [this]()
             {
                 DocumentWidget *document = currentDocument();
-
                 if (document != nullptr)
                 {
                     document->editor()->undo();
@@ -161,7 +377,6 @@ void MainWindow::setupEditActions()
             this, [this]()
             {
                 DocumentWidget *document = currentDocument();
-
                 if (document != nullptr)
                 {
                     document->editor()->cut();
@@ -171,7 +386,6 @@ void MainWindow::setupEditActions()
             this, [this]()
             {
                 DocumentWidget *document = currentDocument();
-
                 if (document != nullptr)
                 {
                     document->editor()->copy();
@@ -219,6 +433,9 @@ void MainWindow::setupViewActions()
     // Reset zoom.
     connect(ui->actionResetZoom, &QAction::triggered,
             this, &MainWindow::resetZoom);
+    // Toggle dark mode.
+    connect(ui->actionDarkMode, &QAction::triggered,
+            this, &MainWindow::toggleDarkMode);
 }
 
 void MainWindow::setupInsertActions()
@@ -434,6 +651,8 @@ void MainWindow::openDocument(const QString &fileName)
     }
     // Create a new document for the file.
     DocumentWidget *document = new DocumentWidget;
+    // Apply the current theme to the new document.
+    document->setDarkMode(darkMode);
     // Load the selected file into the new document.
     if (!document->loadFile(fileName))
     {
@@ -478,6 +697,8 @@ void MainWindow::newTab()
             this, &MainWindow::updateCursorPosition);
     // Reset the window title for an untitled document.
     setWindowTitle("Notex");
+    // Apply the current theme to the new document.
+    document->setDarkMode(darkMode);
 }
 
 void MainWindow::saveFile()
@@ -693,6 +914,22 @@ void MainWindow::exitApp()
     close();
 }
 
+void MainWindow::toggleDarkMode()
+{
+    // Switch between dark and light mode.
+    darkMode = !darkMode;
+    // Apply the new theme.
+    applyTheme();
+    // Change the menu option to show the next available mode.
+    if (darkMode)
+    {
+        ui->actionDarkMode->setText("Light Mode");
+    }
+    else
+    {
+        ui->actionDarkMode->setText("Dark Mode");
+    }
+}
 // destructor
 MainWindow::~MainWindow()
 {

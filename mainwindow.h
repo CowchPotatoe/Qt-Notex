@@ -76,6 +76,12 @@ private:
     void openFromFileSystem(const QModelIndex &index);
     void closeTab(int index);
     void currentTabChanged(int index);
+
+    // Theme operations.
+    void toggleDarkMode();
+    void applyTheme();
+    // Current theme.
+    bool darkMode = false;
 };
 
 #endif // MAINWINDOW_H

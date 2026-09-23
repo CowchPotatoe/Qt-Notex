@@ -12,7 +12,6 @@ class QSplitter;
 class DocumentWidget : public QWidget
 {
     Q_OBJECT
-
 public:
     explicit DocumentWidget(QWidget *parent = nullptr);
 
@@ -22,7 +21,6 @@ public:
     QString getText() const;
     // Get the parsed HTML.
     QString getHtml();
-
     // Set the Markdown text.
     void setText(const QString &text);
     // Load a file into this document.
@@ -31,6 +29,7 @@ public:
     bool saveFile(const QString &fileName);
     // Get the path of the current file.
     QString fileName() const;
+
     // Edit operations.
     void clearText();
 
@@ -42,9 +41,13 @@ public:
     void zoomOut();
     void resetZoom();
 
+    // Theme operations.
+    void setDarkMode(bool darkMode);
+
     // Insert operations.
     void insertBold();
     void insertItalic();
+
 private slots:
     // Update preview when the Markdown changes.
     void updatePreview();
@@ -60,8 +63,13 @@ private:
     MarkdownParser parser;
     // Stores the path of the currently open file.
     QString currentFile;
+
     // Default zoom.
     int zoomLevel = 12;
+    // Current theme.
+    bool darkMode = false;
+    // Render HTML using the current theme.
+    QString renderHtml(const QString &html) const;
 };
 
 #endif // DOCUMENTS_H
