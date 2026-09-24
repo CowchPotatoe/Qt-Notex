@@ -1,6 +1,0 @@
-[requires]
-icu/71.1
-uriparser/0.9.7
-
-[generators]
-CMakeDeps
