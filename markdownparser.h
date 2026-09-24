@@ -1,22 +1,21 @@
 #ifndef MARKDOWNPARSER_H
 #define MARKDOWNPARSER_H
+
 #include <QString>
+
+#include <md4qt/parser.h>
+#include <md4qt/traits.h>
 
 class MarkdownParser
 {
 public:
-    QString parse(const QString &markdown);
+    // Convert Markdown text into HTML.
+    QString parse(const QString &text,
+                  const QString &fileName = QString());
 
 private:
-    // Block Markdown
-    QString heading(const QString &line, int level);
-    QString paragraph(const QString &line);
-    QString unorderedList(const QString &line);
-    QString orderedList(const QString &line);
-
-    // Inline Markdown
-    QString bold(const QString &line);
-    QString italic(const QString &line);
+    // md4qt Markdown parser.
+    MD::Parser<MD::QStringTrait> parser;
 };
 
 #endif // MARKDOWNPARSER_H

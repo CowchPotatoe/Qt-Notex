@@ -9,70 +9,54 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
+
+# --------------------------------------------------
+# Notex
+# --------------------------------------------------
 
 set(PROJECT_SOURCES
-        main.cpp
-        mainwindow.cpp
-        mainwindow.h
-        mainwindow.ui
-        resources/resources.qrc
+    main.cpp
+    mainwindow.cpp
+    mainwindow.h
+    mainwindow.ui
+    resources/resources.qrc
+    markdownparser.h
+    markdownparser.cpp
+    documents.h
+    documents.cpp
 )
 
-if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt_add_executable(Notex
-        MANUAL_FINALIZATION
-        ${PROJECT_SOURCES}
-        markdownparser.h
-        markdownparser.cpp
-        documents.h
-        documents.cpp
-    )
-# Define target properties for Android with Qt 6 as:
-#    set_property(TARGET Notex APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
-#                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
-# For more information, see https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
-else()
-    if(ANDROID)
-        add_library(Notex SHARED
-            ${PROJECT_SOURCES}
-        )
-# Define properties for Android with Qt 5 after find_package() calls as:
-#    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
-    else()
-        add_executable(Notex
-            ${PROJECT_SOURCES}
-        )
-    endif()
-endif()
+qt_add_executable(Notex
+    MANUAL_FINALIZATION
+    ${PROJECT_SOURCES}
+)
 
-target_link_libraries(Notex PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+# md4qt is header-only.
+# The md4qt headers are located in thirdparty/md4qt/md4qt/.
+target_include_directories(Notex PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/md4qt
+)
+
+# Enable md4qt's Qt support.
+target_compile_definitions(Notex PRIVATE
+    MD4QT_QT_SUPPORT
+)
+
+target_link_libraries(Notex PRIVATE
+    Qt6::Widgets
+)
+
 set_target_properties(Notex PROPERTIES
     INSTALL_RPATH "$ORIGIN/../lib64"
 )
 
-# Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
-# If you are developing for iOS or macOS you should consider setting an
-# explicit, fixed bundle identifier manually though.
-if(${QT_VERSION} VERSION_LESS 6.1.0)
-  set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.Notex)
-endif()
-set_target_properties(Notex PROPERTIES
-    ${BUNDLE_ID_OPTION}
-    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
-    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
-    MACOSX_BUNDLE TRUE
-    WIN32_EXECUTABLE TRUE
-)
-
 include(GNUInstallDirs)
+
 install(TARGETS Notex
     BUNDLE DESTINATION .
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
-if(QT_VERSION_MAJOR EQUAL 6)
-    qt_finalize_executable(Notex)
-endif()
+qt_finalize_executable(Notex)

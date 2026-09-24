@@ -4,13 +4,16 @@ A Markdown editor built with **C++ and Qt** with live preview and PDF export.
 
 ## Features
 * Markdown editor with live preview
-* Headings, paragraphs, lists, bold, and italic formatting
+* Markdown parsing powered by [md4qt](https://github.com/KDE/md4qt)
+* Headings, paragraphs, lists, bold, italic, code blocks, and other Markdown formatting
 * Markdown, Preview, and Split views
 * Undo, redo, copy, paste, and zoom controls
 * Open, save, and create Markdown files
-* Multiple document windows
+* Multiple document tabs
 * PDF export with A4 formatting
 * Cursor position indicator
+* Dark and light themes
+* File system browser
 
 ## Installation
 Notex is currently distributed as both an **AppImage** and a **tar.gz** package for **64-bit Linux (x86_64)** systems.
@@ -45,6 +48,7 @@ The tarball contains the Notex application, required Qt libraries, plugins, appl
    ./install.sh
    ```
 The installer creates a desktop entry in the user's application menu and registers the Notex icon.
+
 Notex can also be run directly from the release directory without installing the desktop launcher:
 ```bash
 ./run.sh
@@ -52,15 +56,17 @@ Notex can also be run directly from the release directory without installing the
 
 ## About
 Notex is a personal C++/Qt project created to learn desktop GUI development, text processing, Markdown parsing, file handling, and document rendering.
-The project currently uses a custom, limited Markdown parser for the initial version, with plans to expand its Markdown and LaTeX support over time.
 
 ## Beta
 Notex is currently a beta project. Some features are incomplete, and bugs may still exist.
 
+## Third-Party Software
+Notex includes [md4qt](https://github.com/KDE/md4qt) for Markdown parsing. md4qt is distributed under the **MIT License**. Its source and original license information are included in `thirdparty/md4qt/`.
+
 ## License
 Notex is licensed under the **GNU Lesser General Public License, version 2.1 (LGPL-2.1)**.
 See the [LICENSE](LICENSE) file for the full license text.
-Notex uses the Qt framework, which is distributed under its own applicable licensing terms.
+Notex also uses the Qt framework, which is distributed under its own applicable licensing terms.
 
 ## Author
 Ivan Chen
