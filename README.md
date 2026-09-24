@@ -17,7 +17,6 @@ A Markdown editor built with **C++ and Qt** with live preview and PDF export.
 
 ## Installation
 Notex is currently distributed as both an **AppImage** and a **tar.gz** package for **64-bit Linux (x86_64)** systems.
-
 ### AppImage
 The AppImage is the easiest way to run Notex without installing it.
 1. Download `Notex-x86_64.AppImage`.
@@ -31,7 +30,6 @@ The AppImage is the easiest way to run Notex without installing it.
    ```
 The AppImage can be moved to another folder and run from there.
 > **Note:** The AppImage contains the Notex application, Qt libraries, plugins, and application icon. However, application-menu and dock integration can depend on the Linux desktop environment. Some desktop environments may require additional AppImage integration support for the application to appear as an installed application with its icon.
-
 ### tar.gz
 The tarball contains the Notex application, required Qt libraries, plugins, application icon, and installation scripts.
 1. Download `Notex-release.tar.gz`.
@@ -48,7 +46,6 @@ The tarball contains the Notex application, required Qt libraries, plugins, appl
    ./install.sh
    ```
 The installer creates a desktop entry in the user's application menu and registers the Notex icon.
-
 Notex can also be run directly from the release directory without installing the desktop launcher:
 ```bash
 ./run.sh
@@ -61,7 +58,7 @@ Notex is a personal C++/Qt project created to learn desktop GUI development, tex
 Notex is currently a beta project. Some features are incomplete, and bugs may still exist.
 
 ## Third-Party Software
-Notex includes [md4qt](https://github.com/KDE/md4qt) for Markdown parsing. md4qt is distributed under the **MIT License**. Its source and original license information are included in `thirdparty/md4qt/`.
+Notex includes [md4qt](https://github.com/KDE/md4qt) for Markdown parsing. md4qt is distributed under the **MIT License**. See [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md) for third-party licensing information.
 
 ## License
 Notex is licensed under the **GNU Lesser General Public License, version 2.1 (LGPL-2.1)**.
