@@ -1,6 +1,6 @@
 # Notex
 A Markdown editor built with **C++ and Qt** with live preview and PDF export.
-> **Status:** Beta — v0.1.0
+> **Status:** Beta — v0.2.0
 
 ## Features
 * Markdown editor with live preview
