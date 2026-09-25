@@ -5,6 +5,7 @@ A Markdown editor built with **C++ and Qt** with live preview and PDF export.
 ## Features
 * Markdown editor with live preview
 * Markdown parsing powered by [md4qt](https://github.com/KDE/md4qt)
+* Latex rendering handled by [KaTex](https://github.com/KaTeX/KaTeX)
 * Headings, paragraphs, lists, bold, italic, code blocks, and other Markdown formatting
 * Markdown, Preview, and Split views
 * Undo, redo, copy, paste, and zoom controls
