@@ -409,6 +409,23 @@ QString DocumentWidget::renderHtml(const QString &html) const
             "    border: 0;"
             "    border-top: 1px solid #333333;"
             "}"
+
+            "table {"
+            "    border-collapse: collapse;"
+            "    margin: 12px 0;"
+            "}"
+
+            "th, td {"
+            "    border: 1px solid #555555;"
+            "    padding: 6px 10px;"
+            "    text-align: left;"
+            "}"
+
+            "th {"
+            "    background-color: #282828;"
+            "    color: #f0f0f0;"
+            "}"
+
             "</style>";
     }
 
@@ -453,6 +470,23 @@ QString DocumentWidget::renderHtml(const QString &html) const
             "    border: 0;"
             "    border-top: 1px solid #dddddd;"
             "}"
+
+            "table {"
+            "    border-collapse: collapse;"
+            "    margin: 12px 0;"
+            "}"
+
+            "th, td {"
+            "    border: 1px solid #cccccc;"
+            "    padding: 6px 10px;"
+            "    text-align: left;"
+            "}"
+
+            "th {"
+            "    background-color: #f2f2f2;"
+            "    color: #222222;"
+            "}"
+
             "</style>";
     }
 
