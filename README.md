@@ -58,7 +58,10 @@ Notex is a personal C++/Qt project created to learn desktop GUI development, tex
 Notex is currently a beta project. Some features are incomplete, and bugs may still exist.
 
 ## Third-Party Software
-Notex includes [md4qt](https://github.com/KDE/md4qt) for Markdown parsing. md4qt is distributed under the **MIT License**. See [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md) for third-party licensing information.
+Notex uses [md4qt](https://github.com/KDE/md4qt) for Markdown parsing
+and [KaTeX](https://github.com/KaTeX/KaTeX) for LaTeX math rendering.
+The third-party source and applicable license information are retained
+under `thirdparty/`.
 
 ## License
 Notex is licensed under the **GNU Lesser General Public License, version 2.1 (LGPL-2.1)**.

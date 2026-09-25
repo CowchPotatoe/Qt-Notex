@@ -6,27 +6,34 @@
 #include "markdownparser.h"
 
 class QTextEdit;
-class QTextBrowser;
+class QWebEngineView;
 class QSplitter;
 
 class DocumentWidget : public QWidget
 {
     Q_OBJECT
+
 public:
     explicit DocumentWidget(QWidget *parent = nullptr);
 
     // Get the Markdown editor.
     QTextEdit *editor() const;
+
     // Get the Markdown text.
     QString getText() const;
+
     // Get the parsed HTML.
     QString getHtml();
+
     // Set the Markdown text.
     void setText(const QString &text);
+
     // Load a file into this document.
     bool loadFile(const QString &fileName);
+
     // Save this document to a file.
     bool saveFile(const QString &fileName);
+
     // Get the path of the current file.
     QString fileName() const;
 
@@ -37,6 +44,7 @@ public:
     void showMarkdown();
     void showPreview();
     void showSplit();
+
     void zoomIn();
     void zoomOut();
     void resetZoom();
@@ -55,19 +63,25 @@ private slots:
 private:
     // Markdown editor.
     QTextEdit *textInput;
+
     // Markdown preview.
-    QTextBrowser *preview;
+    QWebEngineView *preview;
+
     // Split the editor and preview horizontally.
     QSplitter *splitter;
+
     // Markdown parser.
     MarkdownParser parser;
-    // Stores the path of the currently open file.
+
+    // Stores the path of the current file.
     QString currentFile;
 
     // Default zoom.
     int zoomLevel = 12;
+
     // Current theme.
-    bool darkMode = false;
+    bool darkMode = true;
+
     // Render HTML using the current theme.
     QString renderHtml(const QString &html) const;
 };

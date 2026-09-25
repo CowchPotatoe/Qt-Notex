@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
 
+# Prevent Qt Creator's injected CMake helper from running.
+set(CMAKE_PROJECT_INCLUDE_BEFORE "")
+
 project(Notex VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_AUTOUIC ON)
@@ -9,7 +12,11 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
+find_package(Qt6 REQUIRED COMPONENTS
+    Core
+    Widgets
+    WebEngineWidgets
+)
 
 # --------------------------------------------------
 # Notex
@@ -32,8 +39,12 @@ qt_add_executable(Notex
     ${PROJECT_SOURCES}
 )
 
+# --------------------------------------------------
+# md4qt
+# --------------------------------------------------
+
 # md4qt is header-only.
-# The md4qt headers are located in thirdparty/md4qt/md4qt/.
+# Its headers are located in thirdparty/md4qt/md4qt/.
 target_include_directories(Notex PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/md4qt
 )
@@ -43,8 +54,43 @@ target_compile_definitions(Notex PRIVATE
     MD4QT_QT_SUPPORT
 )
 
+# --------------------------------------------------
+# KaTeX
+# --------------------------------------------------
+
+file(GLOB KATEX_MAIN_FILES
+    CONFIGURE_DEPENDS
+    ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/katex/*.css
+    ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/katex/*.js
+)
+
+file(GLOB KATEX_CONTRIB_FILES
+    CONFIGURE_DEPENDS
+    ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/katex/contrib/*.js
+)
+
+file(GLOB KATEX_FONT_FILES
+    CONFIGURE_DEPENDS
+    ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/katex/fonts/*
+)
+
+qt_add_resources(Notex
+    "katex"
+    PREFIX "/katex"
+    BASE "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/katex"
+    FILES
+        ${KATEX_MAIN_FILES}
+        ${KATEX_CONTRIB_FILES}
+        ${KATEX_FONT_FILES}
+)
+
+# --------------------------------------------------
+# Libraries
+# --------------------------------------------------
+
 target_link_libraries(Notex PRIVATE
     Qt6::Widgets
+    Qt6::WebEngineWidgets
 )
 
 set_target_properties(Notex PROPERTIES

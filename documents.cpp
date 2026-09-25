@@ -3,12 +3,13 @@
 #include <QFile>
 #include <QFont>
 #include <QSplitter>
-#include <QTextBrowser>
 #include <QTextCursor>
 #include <QTextDocument>
 #include <QTextEdit>
 #include <QTextStream>
+#include <QUrl>
 #include <QVBoxLayout>
+#include <QWebEngineView>
 
 DocumentWidget::DocumentWidget(QWidget *parent)
     : QWidget(parent)
@@ -17,7 +18,7 @@ DocumentWidget::DocumentWidget(QWidget *parent)
     textInput = new QTextEdit(this);
 
     // Create the Markdown preview.
-    preview = new QTextBrowser(this);
+    preview = new QWebEngineView(this);
 
     // Distinguish between editor and preview.
     textInput->setPlaceholderText("Start writing in Markdown...");
@@ -26,7 +27,8 @@ DocumentWidget::DocumentWidget(QWidget *parent)
     preview->setHtml(
         renderHtml(
             "<p>Your Markdown preview will appear here.</p>"
-            )
+            ),
+        QUrl("qrc:/katex/")
         );
 
     // Create a horizontal splitter.
@@ -288,7 +290,8 @@ void DocumentWidget::updatePreview()
         preview->setHtml(
             renderHtml(
                 "<p>Your Markdown preview will appear here.</p>"
-                )
+                ),
+            QUrl("qrc:/katex/")
             );
         return;
     }
@@ -303,11 +306,11 @@ void DocumentWidget::updatePreview()
            html +
            "</div>";
 
-    // Apply the current theme.
+    // Apply the current theme and KaTeX.
     html = renderHtml(html);
 
     // Display the HTML.
-    preview->setHtml(html);
+    preview->setHtml(html, QUrl("qrc:/katex/"));
 }
 
 void DocumentWidget::setDarkMode(bool darkMode)
@@ -329,9 +332,8 @@ void DocumentWidget::setDarkMode(bool darkMode)
             );
 
         preview->setStyleSheet(
-            "QTextBrowser {"
+            "QWebEngineView {"
             "    background-color: #1c1c1c;"
-            "    color: #dadada;"
             "    border: 1px solid #333333;"
             "}"
             );
@@ -351,9 +353,8 @@ void DocumentWidget::setDarkMode(bool darkMode)
             );
 
         preview->setStyleSheet(
-            "QTextBrowser {"
+            "QWebEngineView {"
             "    background-color: #ffffff;"
-            "    color: #222222;"
             "    border: 1px solid #dddddd;"
             "}"
             );
@@ -372,10 +373,11 @@ QString DocumentWidget::renderHtml(const QString &html) const
     {
         css =
             "<style>"
-            "body {"
+            "html, body {"
             "    background-color: #1c1c1c;"
             "    color: #dadada;"
             "    font-family: sans-serif;"
+            "    margin: 8px;"
             "}"
 
             "h1, h2, h3, h4, h5, h6 {"
@@ -415,10 +417,11 @@ QString DocumentWidget::renderHtml(const QString &html) const
     {
         css =
             "<style>"
-            "body {"
+            "html, body {"
             "    background-color: #ffffff;"
             "    color: #222222;"
             "    font-family: sans-serif;"
+            "    margin: 8px;"
             "}"
 
             "h1, h2, h3, h4, h5, h6 {"
@@ -453,14 +456,42 @@ QString DocumentWidget::renderHtml(const QString &html) const
             "</style>";
     }
 
-    // Add the CSS around the parsed HTML.
+    // Add KaTeX, CSS, and the parsed HTML.
     QString renderedHtml =
+        "<!DOCTYPE html>"
         "<html>"
         "<head>"
+        "<meta charset='UTF-8'>"
+
+        "<link rel='stylesheet' "
+        "href='qrc:/katex/katex.min.css'>"
+
         + css +
+
         "</head>"
         "<body>"
         + html +
+
+        "<script src='qrc:/katex/katex.min.js'></script>"
+
+        "<script "
+        "src='qrc:/katex/contrib/auto-render.min.js'>"
+        "</script>"
+
+        "<script>"
+        "document.addEventListener('DOMContentLoaded', function() {"
+        "    renderMathInElement(document.body, {"
+        "        delimiters: ["
+        "            {left: '$$', right: '$$', display: true},"
+        "            {left: '\\\\[', right: '\\\\]', display: true},"
+        "            {left: '\\\\(', right: '\\\\)', display: false},"
+        "            {left: '$', right: '$', display: false}"
+        "        ],"
+        "        throwOnError: false"
+        "    });"
+        "});"
+        "</script>"
+
         "</body>"
         "</html>";
 
